@@ -7,3 +7,21 @@
  - [Awesome README](https://github.com/matiassingers/awesome-readme)
  - [How to write a Good readme](https://bulldogjob.com/news/449-how-to-write-a-good-readme-for-your-github-project)
 
+# Nome do projeto
+## Alunos
+
+- [@GiovanniMP](https://www.github.com/GiovanniMP)
+- [@RodrigoC](https://github.com/dev-Camargo)
+
+
+## Descrição
+
+O projeto tem a ideia de ...
+## Estória dos usuários
+
+Personas 
+- Autônomo
+## Diagrama
+
+![Diagrama UML](link)
+
