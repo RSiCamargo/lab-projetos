@@ -33,6 +33,81 @@ Todos os formatos de envio de arquivo excel estão disponíveis em seguida.
 <a name="hist"></a>
 ## Histórias dos usuários
 
+Como <b>administrador do processo</b>, eu quero que a API execute as requisições feitas pelos usuários de forma adequada, chamando o os processos adequados para cada requisições, e retornando os valores de acordo, para que,
+no final dos períodos propostos, os faturamentos sejam gerados de forma consistente.
+
+#### Critérios de aceitação:
+- As requisições devem ser feitas de acordo com as solicitações.
+- Apenas usuários qualificados podem realiza-las.
+- Todos os dados de cada cliente devem ser guardados no banco corretamente.
+- Os fechamentos devem ser realizados de acordo com as datas propostas pelos usuários, para cada cliente.
+
+#### Story Points: 12
+
+</br>
+</br>
+
+Como <b>usuário do sistema,</b>, eu gostaria que o sistema consumisse todos os dados enviados pelo excel, uma vez respeitando todos os critérios disponível, e por fim associando esses dados ao meu perfil, para que eu seja capaz
+de manter em ordem todo o meu inventário.
+
+#### Critérios de aceitação:
+- O excel deve ser consumido armazenando todas as informações em seus devidos locais
+- As informações devem ser associadas ao perfil do usuário identificado.
+
+#### Story Points: 5
+
+</br>
+</br>
+
+Como <b>usuário do sistema,</b>, 
+
+#### Critérios de aceitação:
+
+
+#### Story Points: 
+
+</br>
+</br>
+
+Como <b>usuário do sistema,</b>, 
+
+#### Critérios de aceitação:
+
+
+#### Story Points: 
+
+</br>
+</br>
+
+Como <b>usuário do sistema,</b>, 
+
+#### Critérios de aceitação:
+
+
+#### Story Points: 
+
+</br>
+</br>
+
+Como <b>usuário do sistema,</b>, 
+
+#### Critérios de aceitação:
+
+
+#### Story Points: 
+
+</br>
+</br>
+
+Como <b>cliente final do usuário,</b>, 
+
+#### Critérios de aceitação:
+
+
+#### Story Points: 
+
+
+
 
 <a name="uml"></a>
 ## Diagrama UML
