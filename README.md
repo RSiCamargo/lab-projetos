@@ -1,5 +1,5 @@
 # <p align="center"><b>Nome do Projeto</b></p>
-  ![App Screenshot](https://www.techsmith.com/blog/wp-content/uploads/2016/12/screenshot-example-show-data.png)
+  ![alt text](/img/logo.png)
   
   
 ## Conteúdo
@@ -12,7 +12,7 @@
 <a name="desc"></a>
 ## Descrição
 
-O projeto tem a ideia de construir uma API visando a automação no processo de faturamento, que devem ser realizados por qualquer microempresa e/ou profissionais autônomos buscando facilitar um de seus processos.
+O projeto tem a ideia de construir uma API visando a automação no processo de criação e fechamento de faturas de microempresa/profissionais autônomos, buscando a economia de tempo e eficiência, para assim gerar mais produtividade a essas entidades. Também garantindo que o cliente final receba sua cobrança de forma simples, rápida e em dia.
 
 
 <a name="autores"></a>
