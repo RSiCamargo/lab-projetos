@@ -12,7 +12,7 @@
 <a name="desc"></a>
 ## Descrição
 
-O projeto tem a ideia de ...
+O projeto tem a ideia de construir uma API visando a automação no processo de faturamento, que devem ser realizados por qualquer microempresa e/ou profissionais autônomos buscando facilitar um de seus processos.
 
 
 <a name="autores"></a>
