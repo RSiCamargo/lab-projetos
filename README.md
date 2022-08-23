@@ -1,4 +1,4 @@
-# <p align="center"><b>Nome do Projeto</b></p>
+# <p align="center"><b>Ward - Sistema de automação de faturamento.</b></p>
   ![alt text](/img/logo.png)
   
   
