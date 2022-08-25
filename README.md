@@ -42,24 +42,45 @@ no final dos períodos propostos, os faturamentos sejam gerados de forma consist
 - Todos os dados de cada cliente devem ser guardados no banco corretamente.
 - Os fechamentos devem ser realizados de acordo com as datas propostas pelos usuários, para cada cliente.
 
-#### Story Points: 12
+#### Story Points: 13
 
 </br>
 </br>
 
-Como <b>usuário do sistema,</b>, eu gostaria que o sistema consumisse todos os dados enviados pelo excel, uma vez respeitando todos os critérios disponível, e por fim associando esses dados ao meu perfil, para que eu seja capaz
+Como <b>usuário do sistema</b>, eu gostaria que o sistema consumisse todos os dados enviados pelo excel, uma vez respeitando todos os critérios disponível, e por fim associando esses dados ao meu perfil, para que eu seja capaz
 de manter em ordem todo o meu inventário.
 
 #### Critérios de aceitação:
 - O excel deve ser consumido armazenando todas as informações em seus devidos locais
 - As informações devem ser associadas ao perfil do usuário identificado.
 
-#### Story Points: 5
+#### Story Points: 3
 
 </br>
 </br>
 
-Como <b>usuário do sistema,</b>, 
+Como <b>usuário do sistema</b>, gostaria que conforme forem enviados arquivos contendo o consumo do meu estoque (para cada cliente), o sistema trate de forma adequada o fluxo de insumos para o faturamento, e atualize meu estoque.
+
+#### Critérios de aceitação:
+- O excel deve ser consumido armazenando todas as informações em seus devidos locais
+- O estoque do usuário deverá ser atualizado de acordo com a utilização dos insumos declarados no excel
+
+#### Story Points: 2
+
+</br>
+</br>
+
+Como <b>usuário do sistema</b>, eu queria que o sistema gerasse o faturamento com a possibilidade de pagamento via pix para meus clientes.
+
+#### Critérios de aceitação:
+- Deverá ser associado ao faturamento o redirecionamento para o pagamento pix (via url ou qr code) já com as informações do usuário e a quantia relativa à cobrança.
+
+#### Story Points: 3
+
+</br>
+</br>
+
+Como <b>usuário do sistema</b>, 
 
 #### Critérios de aceitação:
 
@@ -69,7 +90,7 @@ Como <b>usuário do sistema,</b>,
 </br>
 </br>
 
-Como <b>usuário do sistema,</b>, 
+Como <b>usuário do sistema</b>, 
 
 #### Critérios de aceitação:
 
@@ -79,27 +100,7 @@ Como <b>usuário do sistema,</b>,
 </br>
 </br>
 
-Como <b>usuário do sistema,</b>, 
-
-#### Critérios de aceitação:
-
-
-#### Story Points: 
-
-</br>
-</br>
-
-Como <b>usuário do sistema,</b>, 
-
-#### Critérios de aceitação:
-
-
-#### Story Points: 
-
-</br>
-</br>
-
-Como <b>cliente final do usuário,</b>, 
+Como <b>cliente final do usuário</b>, 
 
 #### Critérios de aceitação:
 
