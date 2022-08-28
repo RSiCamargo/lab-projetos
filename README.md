@@ -131,7 +131,7 @@ Download será adicionado futuramente.
 Exemplo de arquivo utilizado para o <b>controle de estoque do usuário</b>.
 
 </br>
-A imagem será adicionada futuramente.
+<img src="/img/stock.png">
 </br>
 
 Download será adicionado futuramente.
