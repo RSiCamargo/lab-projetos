@@ -1,5 +1,5 @@
 # <p align="center"><b>Ward - Sistema de automação de faturamento.</b></p>
-  ![alt text](/img/logo.png)
+  ![logo](/img/logo.png)
   
   
 ## Conteúdo
@@ -7,7 +7,7 @@
 - [ Autores ](#autores)
 - [ Histórias dos usuários ](#hist)
 - [ Diagrama UML ](#uml)
-- [ Fromatos de Arquivo ](#excel)
+- [ Formatos de Arquivo ](#excel)
 
 
 <a name="desc"></a>
@@ -121,7 +121,7 @@ Como <b>cliente final do usuário</b>, gostaria de receber minha fatura completa
 Exemplo de arquivo utilizado para o <b>controle diário de consumo de insumos</b>.
 
 </br>
-![Diagrama UML](/img/expense.png)
+![excel1](/img/expense.png)
 </br>
 
 Download será adicionado futuramente.
