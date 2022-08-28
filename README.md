@@ -118,10 +118,10 @@ Como <b>cliente final do usuário</b>, gostaria de receber minha fatura completa
 <a name="excel"></a>
 ## Formatos aceitos de Excel
 
-Exemplo de arquivo utilizado para o <b>controle diário de consumo de insumos</b>.
+Exemplo de arquivo utilizado para o <b>controle diário de consumo dos insumos</b>.
 
 </br>
-![excel1](/img/expense.png)
+<img src="/img/expense.png">
 </br>
 
 Download será adicionado futuramente.
