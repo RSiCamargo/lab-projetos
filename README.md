@@ -118,4 +118,20 @@ Como <b>cliente final do usuário</b>, gostaria de receber minha fatura completa
 <a name="excel"></a>
 ## Formatos aceitos de Excel
 
-Serão adicionados futuramente.
+Exemplo de arquivo utilizado para o <b>controle diário de consumo de insumos</b>.
+
+</br>
+![Diagrama UML](/img/expense.png)
+</br>
+
+Download será adicionado futuramente.
+
+</br>
+
+Exemplo de arquivo utilizado para o <b>controle de estoque do usuário</b>.
+
+</br>
+A imagem será adicionada futuramente.
+</br>
+
+Download será adicionado futuramente.
