@@ -31,7 +31,7 @@ Todos os formatos de envio de arquivo excel estão disponíveis em seguida.
 <a name="hist"></a>
 ## Histórias dos usuários
 
-Como <b>administrador do processo</b>, eu quero que a API execute as requisições feitas pelos usuários de forma adequada, chamando o os processos adequados para cada requisições, e retornando os valores de acordo, para que, no final dos períodos propostos, os faturamentos sejam gerados de forma consistente.
+Como <b>administrador do processo</b>, eu quero que a API execute as requisições feitas pelos usuários de forma adequada, chamando os processos adequados para cada requisição, e retornando os valores de acordo, para que, no final dos períodos propostos, os faturamentos sejam gerados de forma consistente.
 
 #### Critérios de aceitação:
 - As requisições devem ser feitas de acordo com as solicitações.
@@ -45,7 +45,7 @@ Como <b>administrador do processo</b>, eu quero que a API execute as requisiçõ
 </br>
 </br>
 
-Como <b>usuário do sistema</b>, eu gostaria que o sistema consumisse todos os dados enviados pelo excel, uma vez respeitando todos os critérios disponível, e por fim associando esses dados ao meu perfil, para que eu seja capaz de manter em ordem todo o meu inventário.
+Como <b>usuário do sistema</b>, eu gostaria que o sistema consumisse todos os dados enviados pelo excel, uma vez respeitando todos os critérios disponíveis e por fim, associando esses dados ao meu perfil para que eu seja capaz de manter em ordem todo o meu inventário.
 
 #### Critérios de aceitação:
 - O excel deve ser consumido armazenando todas as informações em seus devidos locais.
@@ -67,7 +67,7 @@ Como <b>usuário do sistema</b>, gostaria que conforme forem enviados arquivos c
 </br>
 </br>
 
-Como <b>usuário do sistema</b>, eu queria que o sistema gerasse o faturamento com a possibilidade de pagamento via pix para meus clientes.
+Como <b>usuário do sistema</b>, eu gostaria que o sistema gerasse o faturamento com a possibilidade de pagamento via pix para meus clientes.
 
 #### Critérios de aceitação:
 - Deverá ser associado ao faturamento o redirecionamento para o pagamento pix (via url ou qr code) já com as informações do usuário e a quantia relativa à cobrança.
@@ -77,7 +77,7 @@ Como <b>usuário do sistema</b>, eu queria que o sistema gerasse o faturamento c
 </br>
 </br>
 
-Como <b>usuário do sistema</b>, eu gostaria que assim que o faturamento dos clientes fechar (nas datas escolhidas por mim), ele seja enviado tanto para o email de cada cliente, como também uma cópia à mim.
+Como <b>usuário do sistema</b>, eu gostaria que assim que o faturamento dos clientes fechar (nas datas escolhidas por mim), ele seja enviado tanto para o email do cliente, como também uma cópia à mim.
 
 #### Critérios de aceitação:
 - O faturamento, de cada cliente, deve fechar na data escolhida pelo usuário.
@@ -99,7 +99,7 @@ Como <b>usuário do sistema</b>, assim que meu estoque estiver acabando (menos d
 </br>
 </br>
 
-Como <b>cliente final do usuário</b>, gostaria de receber minha fatura completa no email, contendo todas as informações sobre os custos de cada consumo, junto com o valor total a ser pago.
+Como <b>cliente final do usuário</b>, gostaria de receber minha fatura completa por email, contendo todas as informações sobre os consumos, junto com o valor total a ser pago.
 
 #### Critérios de aceitação:
 - Fatura enviada deve conter detalhes dos consumos, junto à seus preços finais.
