@@ -118,7 +118,19 @@ Como <b>cliente final do usuário</b>, gostaria de receber minha fatura completa
 <a name="excel"></a>
 ## Planilhas a serem utilizadas
 
-Exemplo de arquivo utilizado para o <b>controle de clientes e dados do usuário</b>.
+Exemplo de arquivo utilizado para o <b>controle de clientes e dados do usuário</b>. A chave PIX deve ser adicionada sem pontos, traços ou outros caracteres especiais, apenas números. A primeira linha de clientes deverá ser substituida por dados verdadeiros, assim como sua data de cobrança. 
+Se a listagem de clientes ultrapassar o limite do template, dados adicionais poderão ser adicionados sequêncialmente nas mesmas colunas e 
+respeitando suas formatações.
+
+</br>
+<img src="/img/data.png">
+</br>
+
+Download será adicionado futuramente.
+
+</br>
+
+Exemplo de arquivo utilizado para o <b>controle diário de consumo dos insumos</b>. A data é relativa ao dia em que os insumos foram utilizados. A primeira linha de informações deverá ser substituída por valores verídicos, sendo eles o nome do cliente ligado ao produto, o nome do produto (mesmo nome utilizado em sua planilha de estoque, que será apresentada a seguir), quantidade utilizada/vendida e sua porcentagem de repasse (porcentagem em cima do seu custo de cada insumo).
 
 </br>
 <img src="/img/expense.png">
@@ -128,17 +140,7 @@ Download será adicionado futuramente.
 
 </br>
 
-Exemplo de arquivo utilizado para o <b>controle diário de consumo dos insumos</b>.
-
-</br>
-<img src="/img/expense.png">
-</br>
-
-Download será adicionado futuramente.
-
-</br>
-
-Exemplo de arquivo utilizado para o <b>controle de estoque do usuário</b>.
+Exemplo de arquivo utilizado para o <b>controle de estoque do usuário</b>. A primeira linha de dados deverá ser substituída por valores verídicos. Essa tabela consiste no nome do insumo de seu estoque (mesmo nome utilizado na planilha de consumo já apresentada), quantidade que IRÁ ser adicionada em seu estoque do sistema (toda planilha de estoque que enviar será somada aos produtos já existentes em seu perfil) e seu valor de custo (quanto pagou pelo insumo).
 
 </br>
 <img src="/img/stock.png">
