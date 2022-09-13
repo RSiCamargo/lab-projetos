@@ -126,7 +126,7 @@ respeitando suas formatações.
 <img src="/img/data.png">
 </br>
 
-[Download](/download/Exemplo-Data.xlsx)
+[Download](/download/Exemplo-Dados.xlsx)
 
 </br>
 
@@ -136,7 +136,7 @@ Exemplo de arquivo utilizado para o <b>controle diário de consumo dos insumos</
 <img src="/img/expense.png">
 </br>
 
-[Download](/download/Exemplo-Expense.xlsx)
+[Download](/download/Exemplo-Consumo.xlsx)
 
 </br>
 
@@ -146,4 +146,4 @@ Exemplo de arquivo utilizado para o <b>controle de estoque do usuário</b>. A pr
 <img src="/img/stock.png">
 </br>
 
-[Download](/download/Exemplo-Stock.xlsx)
+[Download](/download/Exemplo-Estoque.xlsx)
