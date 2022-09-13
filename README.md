@@ -116,7 +116,17 @@ Como <b>cliente final do usuário</b>, gostaria de receber minha fatura completa
 
 
 <a name="excel"></a>
-## Formatos aceitos de Excel
+## Planilhas a serem utilizadas
+
+Exemplo de arquivo utilizado para o <b>controle de clientes e dados do usuário</b>.
+
+</br>
+<img src="/img/expense.png">
+</br>
+
+Download será adicionado futuramente.
+
+</br>
 
 Exemplo de arquivo utilizado para o <b>controle diário de consumo dos insumos</b>.
 
