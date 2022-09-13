@@ -123,7 +123,7 @@ Se a listagem de clientes ultrapassar o limite do template, dados adicionais pod
 respeitando suas formatações.
 
 </br>
-<img src="/img/data.png">
+<img src="/img/datas.png">
 </br>
 
 [Download](/download/Exemplo-Dados.xlsx)
