@@ -118,10 +118,10 @@ Como <b>cliente final do usuário</b>, gostaria de receber minha fatura completa
 <a name="excel"></a>
 ## Planilhas a serem utilizadas
 
-Exemplo de arquivo utilizado para o <b>controle de clientes e dados do usuário</b>. A chave PIX deve ser adicionada sem pontos, traços ou outros caracteres especiais, apenas números. A primeira linha de clientes deverá ser substituida por dados verdadeiros, assim como o dia de sua cobrança, email e cidade onde o cliente reside. Se a listagem de clientes ultrapassar o limite do template, dados adicionais poderão ser adicionados sequêncialmente nas mesmas colunas e respeitando suas formatações. O sistema irá atualizar seus dados e clientes sempre que enviar uma nova planilha (tanto adicionando quando retirando informações).
+Exemplo de arquivo utilizado para o <b>controle de clientes e dados do usuário</b>. A chave PIX deve ser adicionada no formato (11) 99876-5432, apenas a chave telefone está sendo aceita no momento. A primeira linha de clientes deverá ser substituida por dados verdadeiros, assim como o dia de sua cobrança, email e cidade onde o cliente reside. Se a listagem de clientes ultrapassar o limite do template, dados adicionais poderão ser adicionados sequêncialmente nas mesmas colunas e respeitando suas formatações. O sistema irá atualizar seus dados e clientes sempre que enviar uma nova planilha (tanto adicionando quando retirando informações).
 
 </br>
-<img src="/img/datas.png">
+<img src="/img/data.png">
 </br>
 
 [Download](/download/Exemplo-Dados.xlsx)
