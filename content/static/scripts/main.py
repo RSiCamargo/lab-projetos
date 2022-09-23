@@ -252,7 +252,7 @@ def checkStock():
     for all in row:
         sendStockAlertMail(all[0], all[1], all[2])
 
-    stmt = ("SELECT product,amount,userEmail FROM stock,data WHERE amount = warning")
+    stmt = ("SELECT product,amount,userEmail FROM stock,data WHERE amount = warning GROUP BY product,amount,userEmail ")
     cursor.execute(stmt)
     row = cursor.fetchall()
     for all in row:
