@@ -18,10 +18,6 @@ import cgitb
 cgitb.enable()
 
 
-
-
-
-
 # --------------- Cria a conexão com o banco de dados ---------------
 
 def create_connection(host_name, user_name, user_password, db_name):
@@ -179,10 +175,10 @@ def createBilling():
     cursor.execute(stmt, d)
     row = cursor.fetchall()
 
-    for index,all in row:
+    for index, all in row:
         # loop dos registros
-        print(all[0],all[1],all[2],all[3],all[4])
-        if():
+        print(all[0], all[1], all[2], all[3], all[4])
+        if ():
             print('teste')
 
         # checkout = XXX*(all[4]/100) Buscar valor do produto no estoque do usuario
@@ -191,7 +187,7 @@ def createBilling():
         # pix = generateQRCode(all[0], all[2], all[3], all[4])
         # img = f"/content/static/generatedpix/pix-{all[3]}.png"
 
-        # sendBillingMail(img, all[1], all[4], all[5], all[6])
+        # sendBillingMail(img, all[1], all[3], all[4], all[5], all[6])
 
     print("Fechando Faturamento")
 
@@ -216,21 +212,27 @@ def sendStockAlertMail(product, amount, userEmail):
     to = userEmail
 
     subject = 'Aviso de estoque'
-    content = [f'<h3>O(s) produto(s) {product} de seu estoque chegaram a marca de alerta ou foram zerados!</h3>']
+    content = [
+        f'<h3>O(s) produto(s) {product} de seu estoque chegaram a marca de alerta ou foram zerados!</h3>']
 
     with yagmail.SMTP(user, app_password) as yag:
         yag.send(to, subject, content)
         print('Sent email successfully')
 
 
-def sendBillingMail(qr, clientMail, value, product, amount):
+def sendBillingMail(qr, client, clientMail, userName, value, product, amount, total):
     user = 'labprojetospuc@gmail.com'
     app_password = 'npfyvwfaljvlvplv'  # Token for gmail
     to = clientMail
 
-    subject = 'Cobrança de consumo'
-    content = ['<h2>Fatura sobre os produtos comprados</h2>',
-               f'<h4>Produto: {product}</h4>', f'<h4>Quantide: {amount}</h4>', f'<h4>Escaneie o qrcode para realizar o pagamento via pix</h4>']
+    lista = f'<span><p>{product}</p><i>{amount}</i><a>R$10,00</a></span>'
+
+    subject = f'Cobrança à {userName}'
+    content = ['<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta http-equiv="X-UA-Compatible" content="ie=edge"><style>body {text-align: center;background-color: #e1e1e1;}section {height: 800px;}footer {margin-top: 10px;color: rgb(143, 143, 143);font-family: sans-serif;}footer p {padding: 0px;margin: 5px;}article span p {text-align: left;display: inline-block;width: 70%;}article span a {text-align: right;display: inline-block;width: 15%;position: relative;}article span {border-bottom: 1px solid lightgray;display: inline-block;width: 100%;}article div {width: 100%;}article div p{width: 95%;text-align: right;font-family: sans-serif;font-size: large;font-weight: bold;}article div a {display: inline-block;position: relative;font-weight: bold;text-align: left;}</style></head><body><div>',
+               f'<h2>Olá {client},</h2><p style="font-size: large">Este é um email referente à cobrança gerada por {userName}. Em anexo segue o código pix referente ao valor de R${total}.</p></div>',
+               '<div style="border: solid 1px gray; width: 1000px; margin: 0 auto; background-color: white; box-shadow: 2px 2px #86868621"><header><img src="./content/static/img/title.png" alt="header" width="1000" height="100"></header><section><article><h1>Resumo da compra</h1><div><a style="width: 65%; padding-left: 3%">Produto</a><a style="width: 12.5%; padding-left: 2.5%">Quantidade</a><a style="width: 9%; padding-left: 1%">Preço(un.)</a></div>',
+               lista,
+               '<div style="border-top: 2px solid black"><p>Total: R$30,00</p></div></article></section></div><footer><p>Ward - Automated Billing Service</p><p>Av. Padre Cletus Francis Cox, 1661 - Country Club, Poços de Caldas - MG, 37714-620</p><p>Nos contate em labprojetospuc@gmail.com</p></footer></body></html>']
     attachments = [qr]
 
     with yagmail.SMTP(user, app_password) as yag:
@@ -241,7 +243,8 @@ def sendBillingMail(qr, clientMail, value, product, amount):
 # --------------- Rotina de Controle de Estoque ---------------
 def checkStock():
     # Vai checar, para cada user, como estao os estoques
-    connection = create_connection("us-cdbr-east-06.cleardb.net", "b090112be85288", "2f84fdce", "heroku_7324e25c80c3d90")
+    connection = create_connection(
+        "us-cdbr-east-06.cleardb.net", "b090112be85288", "2f84fdce", "heroku_7324e25c80c3d90")
     cursor = connection.cursor()
     stmt = ("SELECT product,amount,userEmail FROM stock,data WHERE amount = 0")
     cursor.execute(stmt)
@@ -257,6 +260,8 @@ def checkStock():
     cursor.close
 
 # --------------- Controle de Rotinas ---------------
+
+
 def callDailyRoutines():
     try:
         createBilling()
@@ -275,9 +280,11 @@ app = Flask(__name__)
 app._static_folder = '/content'
 run_with_ngrok(app)
 
+
 @app.route("/")
 def home():
     return render_template('index.html')
+
 
 app.run()
 
@@ -309,4 +316,3 @@ elif code == 'dados':
     readDataFile(sheet)
 else:
     print('O arquivo não pode ser validado. Por favor utilize os templates disponíveis no github!')
-
