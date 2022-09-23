@@ -233,7 +233,11 @@ def sendBillingMail(qr, client, user, product, total):
     app_password = 'npfyvwfaljvlvplv'  # Token for gmail
     to = client.email
 
-    lista = f'<span><p>{product.name}</p><i>{product.amount}</i><a>R${product.price}</a></span>'
+    lista = ""
+
+    for num in len(product.name):
+        lista = list + \
+            f'<span><p>{product.name[num]}</p><i>{product.amount[num]}</i><a>R${product.price[num]}</a></span>'
 
     subject = f'Cobrança à {user.name}'
     content = ['<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta http-equiv="X-UA-Compatible" content="ie=edge"><style>body {text-align: center;background-color: #e1e1e1;}section {height: 800px;}footer {margin-top: 10px;color: rgb(143, 143, 143);font-family: sans-serif;}footer p {padding: 0px;margin: 5px;}article span p {text-align: left;display: inline-block;width: 70%;}article span a {text-align: right;display: inline-block;width: 15%;position: relative;}article span {border-bottom: 1px solid lightgray;display: inline-block;width: 100%;}article div {width: 100%;}article div p{width: 95%;text-align: right;font-family: sans-serif;font-size: large;font-weight: bold;}article div a {display: inline-block;position: relative;font-weight: bold;text-align: left;}</style></head><body><div>',
