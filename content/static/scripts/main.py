@@ -170,16 +170,13 @@ def createBilling():
         date = row[0]
 
     day = date.strftime("%d")
-    stmt = ("SELECT cons.clientName,product,amount,percentage,email FROM cons,data WHERE billingDay = %s AND cons.clientName = data.clientName")
+    stmt = ("SELECT userPix,cons.clientName,email,city,userName,GROUP_CONCAT(percentage),GROUP_CONCAT(product) FROM data,cons WHERE billingDay = %s and data.clientName = cons.clientName group by userPix")
     d = (day,)
     cursor.execute(stmt, d)
     row = cursor.fetchall()
 
-    for index, all in row:
-        # loop dos registros
-        print(all[0], all[1], all[2], all[3], all[4])
-        if ():
-            print('teste')
+    for all in row:
+        print(all[0],all[1],all[2],all[3],all[4],all[5],all[6])
 
         # checkout = XXX*(all[4]/100) Buscar valor do produto no estoque do usuario
         # Buscando apenas 1 produto, integrar todos os retornados
@@ -246,13 +243,13 @@ def checkStock():
     connection = create_connection(
         "us-cdbr-east-06.cleardb.net", "b090112be85288", "2f84fdce", "heroku_7324e25c80c3d90")
     cursor = connection.cursor()
-    stmt = ("SELECT product,amount,userEmail FROM stock,data WHERE amount = 0")
+    stmt = ("SELECT product,amount,userEmail FROM stock,data WHERE amount = 0 group by product")
     cursor.execute(stmt)
     row = cursor.fetchall()
     for all in row:
         sendStockAlertMail(all[0], all[1], all[2])
 
-    stmt = ("SELECT product,amount,userEmail FROM stock,data WHERE amount = warning GROUP BY product,amount,userEmail ")
+    stmt = ("SELECT product,amount,userEmail FROM stock,data WHERE amount = warning GROUP BY product,amount,userEmail")
     cursor.execute(stmt)
     row = cursor.fetchall()
     for all in row:
