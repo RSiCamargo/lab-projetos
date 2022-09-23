@@ -17,35 +17,9 @@ import os
 import cgitb
 cgitb.enable()
 
-checkStock()
-
-form = cgi.FieldStorage()
-fileitem = form['filename']
-
-if fileitem.filename:
-    fn = os.path.basename(fileitem.filename)
-
-    try:
-        # Aqui entrar o arquivo de upload
-        input_sheet = load_workbook(filename=fn)
-    except ValueError:
-        print("Erro no upload de arquivo. Será aceita apenas a extensão .xlsx")
-
-else:
-    print("Nenhum arquivo foi anexado")
 
 
-sheet = input_sheet.active  # Selecionar a planilha pra trabalhar
-code = sheet["AA1"].value
 
-if code == 'expense':
-    readExpenseFile(sheet)
-elif code == 'stock':
-    readStockFile(sheet)
-elif code == 'dados':
-    readDataFile(sheet)
-else:
-    print('O arquivo não pode ser validado. Por favor utilize os templates disponíveis no github!')
 
 
 # --------------- Cria a conexão com o banco de dados ---------------
@@ -200,22 +174,24 @@ def createBilling():
         date = row[0]
 
     day = date.strftime("%d")
-    stmt = ("SELECT userPix,email,city,userName,percentage,product,amount FROM data,cons WHERE billingDay = %s and data.clientName = cons.clientName")
+    stmt = ("SELECT cons.clientName,product,amount,percentage,email FROM cons,data WHERE billingDay = %s AND cons.clientName = data.clientName")
     d = (day,)
     cursor.execute(stmt, d)
     row = cursor.fetchall()
 
-    for all in row:
+    for index,all in row:
         # loop dos registros
-        print(all)
+        print(all[0],all[1],all[2],all[3],all[4])
+        if():
+            print('teste')
 
         # checkout = XXX*(all[4]/100) Buscar valor do produto no estoque do usuario
         # Buscando apenas 1 produto, integrar todos os retornados
 
-        pix = generateQRCode(all[0], all[2], all[3], all[4])
-        img = f"/content/static/generatedpix/pix-{all[3]}.png"
+        # pix = generateQRCode(all[0], all[2], all[3], all[4])
+        # img = f"/content/static/generatedpix/pix-{all[3]}.png"
 
-        sendBillingMail(img, all[1], all[4], all[5], all[6])
+        # sendBillingMail(img, all[1], all[4], all[5], all[6])
 
     print("Fechando Faturamento")
 
@@ -240,7 +216,7 @@ def sendStockAlertMail(product, amount, userEmail):
     to = userEmail
 
     subject = 'Aviso de estoque'
-    content = [f'<h3>O produto {product} de seu estoque foi zerado</h3>']
+    content = [f'<h3>O(s) produto(s) {product} de seu estoque chegaram a marca de alerta ou foram zerados!</h3>']
 
     with yagmail.SMTP(user, app_password) as yag:
         yag.send(to, subject, content)
@@ -265,8 +241,7 @@ def sendBillingMail(qr, clientMail, value, product, amount):
 # --------------- Rotina de Controle de Estoque ---------------
 def checkStock():
     # Vai checar, para cada user, como estao os estoques
-    connection = create_connection(
-        "us-cdbr-east-06.cleardb.net", "b090112be85288", "2f84fdce", "heroku_7324e25c80c3d90")
+    connection = create_connection("us-cdbr-east-06.cleardb.net", "b090112be85288", "2f84fdce", "heroku_7324e25c80c3d90")
     cursor = connection.cursor()
     stmt = ("SELECT product,amount,userEmail FROM stock,data WHERE amount = 0")
     cursor.execute(stmt)
@@ -274,8 +249,12 @@ def checkStock():
     for all in row:
         sendStockAlertMail(all[0], all[1], all[2])
 
-    # stmt = ("SELECT")
-
+    stmt = ("SELECT product,amount,userEmail FROM stock,data WHERE amount = warning")
+    cursor.execute(stmt)
+    row = cursor.fetchall()
+    for all in row:
+        sendStockAlertMail(all[0], all[1], all[2])
+    cursor.close
 
 # --------------- Controle de Rotinas ---------------
 def callDailyRoutines():
@@ -283,17 +262,51 @@ def callDailyRoutines():
         createBilling()
     except ValueError:
         print("Erro ao gerar faturamento!")
+    try:
+        checkStock()
+    except ValueError:
+        print("Erro ao realizar a verificação do estoque!")
 
 
 callDailyRoutines()
 
 
-# app = Flask(__name__)
-# app._static_folder = '/content'
-# run_with_ngrok(app)
+app = Flask(__name__)
+app._static_folder = '/content'
+run_with_ngrok(app)
 
-# @app.route("/")
-# def home():
-#     return render_template('index.html')
+@app.route("/")
+def home():
+    return render_template('index.html')
 
-# app.run()
+app.run()
+
+
+form = cgi.FieldStorage()
+fileitem = form['filename']
+
+if fileitem.filename:
+    fn = os.path.basename(fileitem.filename)
+
+    try:
+        # Aqui entrar o arquivo de upload
+        input_sheet = load_workbook(filename=fn)
+    except ValueError:
+        print("Erro no upload de arquivo. Será aceita apenas a extensão .xlsx")
+
+else:
+    print("Nenhum arquivo foi anexado")
+
+
+sheet = input_sheet.active  # Selecionar a planilha pra trabalhar
+code = sheet["AA1"].value
+
+if code == 'expense':
+    readExpenseFile(sheet)
+elif code == 'stock':
+    readStockFile(sheet)
+elif code == 'dados':
+    readDataFile(sheet)
+else:
+    print('O arquivo não pode ser validado. Por favor utilize os templates disponíveis no github!')
+
