@@ -170,21 +170,27 @@ def createBilling():
         date = row[0]
 
     day = date.strftime("%d")
-    stmt = ("SELECT userPix,cons.clientName,email,city,userName,GROUP_CONCAT(percentage),GROUP_CONCAT(product) FROM data,cons WHERE billingDay = %s and data.clientName = cons.clientName group by userPix")
+    stmt = ("SELECT userPix,cons.clientName,email,city,userName,GROUP_CONCAT(price),GROUP_CONCAT(product),GROUP_CONCAT(amount) FROM data,cons WHERE billingDay = %s and data.clientName = cons.clientName group by userPix")
     d = (day,)
     cursor.execute(stmt, d)
     row = cursor.fetchall()
 
     for all in row:
-        print(all[0],all[1],all[2],all[3],all[4],all[5],all[6])
+        # print(all[0], all[1], all[2], all[3], all[4], all[5], all[6], all[7])
 
-        # checkout = XXX*(all[4]/100) Buscar valor do produto no estoque do usuario
-        # Buscando apenas 1 produto, integrar todos os retornados
+        priceList = all[5].split(',')
+        total = sum(int(i) for i in priceList)
 
-        # pix = generateQRCode(all[0], all[2], all[3], all[4])
-        # img = f"/content/static/generatedpix/pix-{all[3]}.png"
+        currentUser = User(all[4], "null", all[0])
+        currentClient = Client(all[1], all[2], all[3], "null")
+        currentProduct = Product(all[6].split(
+            ','), all[7].split(','), priceList)
 
-        # sendBillingMail(img, all[1], all[3], all[4], all[5], all[6])
+        pix = generateQRCode(all[0], all[3], all[4], total)
+        qr = f"/content/static/generatedpix/pix-{all[1]}.png"
+
+        sendBillingMail(qr, currentClient, currentUser,
+                        currentProduct, total)
 
     print("Fechando Faturamento")
 
@@ -203,33 +209,38 @@ def generateQRCode(userPix, city, username, value):
 
 # --------------- Envio de Email ---------------
 
-def sendStockAlertMail(product, amount, userEmail):
+def sendStockAlertMail(product, user):
     user = 'labprojetospuc@gmail.com'
     app_password = 'npfyvwfaljvlvplv'  # Token for gmail
-    to = userEmail
+    to = user.email
 
-    subject = 'Aviso de estoque'
-    content = [
-        f'<h3>O(s) produto(s) {product} de seu estoque chegaram a marca de alerta ou foram zerados!</h3>']
+    lista = f'<span><p>{product.name}</p><i>{product.amount}</i><a>R${product.price}</a></span>'
+
+    subject = 'Alerta de produtos esgotando do estoque'
+    content = ['<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta http-equiv="X-UA-Compatible" content="ie=edge"><style>body {text-align: center;background-color: #e1e1e1;}section {height: 800px;}footer {margin-top: 10px;color: rgb(143, 143, 143);font-family: sans-serif;}footer p {padding: 0px;margin: 5px;}article span p {text-align: left;display: inline-block;width: 70%;}article span a {text-align: right;display: inline-block;width: 15%;position: relative;}article span {border-bottom: 1px solid lightgray;display: inline-block;width: 100%;}article div {width: 100%;}article div p{width: 95%;text-align: right;font-family: sans-serif;font-size: large;font-weight: bold;}article div a {display: inline-block;position: relative;font-weight: bold;text-align: left;}</style></head><body><div>',
+               f'<h2>Olá {user.name},</h2>',
+               '<p style="font-size: large">Este é um email de aviso referente aos produtos que estão acabando de seu estoque. <br> Para adicionar mais no sistema, utilize a mesma template de estoque APENAS com os produtos que irá acrescentar a ele.</p></div><div style="border: solid 1px gray; width: 1000px; margin: 0 auto; background-color: white; box-shadow: 2px 2px #86868621"><header><img src="./content/static/img/title.png" alt="header" width="1000" height="100"></header><section><article><h1>Estoque abaixo do limite</h1><div><a style="width: 65%; padding-left: 3%">Produto</a><a style="width: 12.5%; padding-left: 2.5%">Quantidade</a><a style="width: 9%; padding-left: 1%">Preço(un.)</a></div>',
+               lista,
+               '<div style="border-top: 2px solid black"><p>Total: R$30,00</p></div></article></section></div><footer><p>Ward - Automated Billing Service</p><p>Av. Padre Cletus Francis Cox, 1661 - Country Club, Poços de Caldas - MG, 37714-620</p><p>Nos contate em labprojetospuc@gmail.com</p></footer></body></html>']
 
     with yagmail.SMTP(user, app_password) as yag:
         yag.send(to, subject, content)
         print('Sent email successfully')
 
 
-def sendBillingMail(qr, client, clientMail, userName, value, product, amount, total):
+def sendBillingMail(qr, client, user, product, total):
     user = 'labprojetospuc@gmail.com'
     app_password = 'npfyvwfaljvlvplv'  # Token for gmail
-    to = clientMail
+    to = client.email
 
-    lista = f'<span><p>{product}</p><i>{amount}</i><a>R$10,00</a></span>'
+    lista = f'<span><p>{product.name}</p><i>{product.amount}</i><a>R${product.price}</a></span>'
 
-    subject = f'Cobrança à {userName}'
+    subject = f'Cobrança à {user.name}'
     content = ['<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta http-equiv="X-UA-Compatible" content="ie=edge"><style>body {text-align: center;background-color: #e1e1e1;}section {height: 800px;}footer {margin-top: 10px;color: rgb(143, 143, 143);font-family: sans-serif;}footer p {padding: 0px;margin: 5px;}article span p {text-align: left;display: inline-block;width: 70%;}article span a {text-align: right;display: inline-block;width: 15%;position: relative;}article span {border-bottom: 1px solid lightgray;display: inline-block;width: 100%;}article div {width: 100%;}article div p{width: 95%;text-align: right;font-family: sans-serif;font-size: large;font-weight: bold;}article div a {display: inline-block;position: relative;font-weight: bold;text-align: left;}</style></head><body><div>',
-               f'<h2>Olá {client},</h2><p style="font-size: large">Este é um email referente à cobrança gerada por {userName}. Em anexo segue o código pix referente ao valor de R${total}.</p></div>',
+               f'<h2>Olá {client.name},</h2><p style="font-size: large">Este é um email referente à cobrança gerada por {user.name}. Em anexo segue o código pix referente ao valor de R${total}.</p></div>',
                '<div style="border: solid 1px gray; width: 1000px; margin: 0 auto; background-color: white; box-shadow: 2px 2px #86868621"><header><img src="./content/static/img/title.png" alt="header" width="1000" height="100"></header><section><article><h1>Resumo da compra</h1><div><a style="width: 65%; padding-left: 3%">Produto</a><a style="width: 12.5%; padding-left: 2.5%">Quantidade</a><a style="width: 9%; padding-left: 1%">Preço(un.)</a></div>',
                lista,
-               '<div style="border-top: 2px solid black"><p>Total: R$30,00</p></div></article></section></div><footer><p>Ward - Automated Billing Service</p><p>Av. Padre Cletus Francis Cox, 1661 - Country Club, Poços de Caldas - MG, 37714-620</p><p>Nos contate em labprojetospuc@gmail.com</p></footer></body></html>']
+               f'<div style="border-top: 2px solid black"><p>Total: R${total}</p></div></article></section></div><footer><p>Ward - Automated Billing Service</p><p>Av. Padre Cletus Francis Cox, 1661 - Country Club, Poços de Caldas - MG, 37714-620</p><p>Nos contate em labprojetospuc@gmail.com</p></footer></body></html>']
     attachments = [qr]
 
     with yagmail.SMTP(user, app_password) as yag:
@@ -273,17 +284,17 @@ def callDailyRoutines():
 callDailyRoutines()
 
 
-app = Flask(__name__)
-app._static_folder = '/content'
-run_with_ngrok(app)
+# app = Flask(__name__)
+# app._static_folder = '/content'
+# run_with_ngrok(app)
 
 
-@app.route("/")
-def home():
-    return render_template('index.html')
+# @app.route("/")
+# def home():
+#     return render_template('index.html')
 
 
-app.run()
+# app.run()
 
 
 form = cgi.FieldStorage()
@@ -313,3 +324,25 @@ elif code == 'dados':
     readDataFile(sheet)
 else:
     print('O arquivo não pode ser validado. Por favor utilize os templates disponíveis no github!')
+
+
+class User:
+    def __init__(self, name, email, pix):
+        self.name = name
+        self.email = email
+        self.pix = pix
+
+
+class Client:
+    def __init__(self, name, email, address, date):
+        self.name = name
+        self.email = email
+        self.address = address
+        self.date = date
+
+
+class Product:
+    def __init__(self, name, amount, unitPrice, percentage):
+        self.name = name
+        self.amount = amount
+        self.unitPrice = unitPrice
