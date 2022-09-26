@@ -41,7 +41,6 @@ class Product:
         self.unitPrice = unitPrice
 
 
-
 # --------------- Cria a conexão com o banco de dados ---------------
 
 def create_connection(host_name, user_name, user_password, db_name):
@@ -214,8 +213,7 @@ def createBilling():
 
         qr = f"C:\ProjetosGit\lab-projetos\content\static\generatedpix/pix-{all[1]}.png"
 
-
-        sendBillingMail(qr, currentClient, currentUser,currentProduct, total)
+        sendBillingMail(qr, currentClient, currentUser, currentProduct, total)
         print(7)
 
     print("Fechando Faturamento")
@@ -227,7 +225,8 @@ def generateQRCode(userPix, city, username, value, clientName):
     pix = PixQrCode(username, userPix, city, value)
 
     if pix.is_valid():
-        pix.save_qrcode("C:\ProjetosGit\lab-projetos\content\static\generatedpix",f"pix-{clientName}")
+        pix.save_qrcode(
+            "C:\ProjetosGit\lab-projetos\content\static\generatedpix", f"pix-{clientName}")
         return pix.generate_code()
     else:
         return "Dados para Pix inválidos."
@@ -240,14 +239,24 @@ def sendStockAlertMail(product, user):
     app_password = 'npfyvwfaljvlvplv'  # Token for gmail
     to = user.email
 
-    lista = f'<span><p>{product.name}</p><i>{product.amount}</i><a>R${product.price}</a></span>'
+    productList = product.name
+    amountList = product.amount
+    priceList = product.unitPrice
+
+    list = ""
+
+    for num in range(len(productList)):
+        lista = list + \
+            f'<span style="border-bottom: 1px solid lightgray;display: inline-block;width: 100%;"><p style="text-align: left;display: inline-block;width: 70%;">{productList[num]}</p><i>{amountList[num]}</i><a style="text-align: right;display: inline-block;width: 15%;position: relative;">R${priceList[num]}</a></span>'
 
     subject = 'Alerta de produtos esgotando do estoque'
-    content = ['<!DOChtml><tml lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta http-equiv="X-UA-Compatible" content="ie=edge"><style>body {text-align: center;background-color: #e1e1e1;}section {height: 800px;}footer {margin-top: 10px;color: rgb(143, 143, 143);font-family: sans-serif;}footer p {padding: 0px;margin: 5px;}article span p {text-align: left;display: inline-block;width: 70%;}article span a {text-align: right;display: inline-block;width: 15%;position: relative;}article span {border-bottom: 1px solid lightgray;display: inline-block;width: 100%;}article div {width: 100%;}article div p{width: 95%;text-align: right;font-family: sans-serif;font-size: large;font-weight: bold;}article div a {display: inline-block;position: relative;font-weight: bold;text-align: left;}</style></head><body><div>',
-               f'<h2>Olá {user.name},</h2>',
-               '<p style="font-size: large">Este é um email de aviso referente aos produtos que estão acabando de seu estoque. <br> Para adicionar mais no sistema, utilize a mesma template de estoque APENAS com os produtos que irá acrescentar a ele.</p></div><div style="border: solid 1px gray; width: 1000px; margin: 0 auto; background-color: white; box-shadow: 2px 2px #86868621"><header><img src="./content/static/img/title.png" alt="header" width="1000" height="100"></header><section><article><h1>Estoque abaixo do limite</h1><div><a style="width: 65%; padding-left: 3%">Produto</a><a style="width: 12.5%; padding-left: 2.5%">Quantidade</a><a style="width: 9%; padding-left: 1%">Preço(un.)</a></div>',
+    content = ['<div style="text-align: center;background-color: #e1e1e1;"><div>',
+               f'<h2>Olá {user.name},</h2><p style="font-size: large">Este é um email de aviso referente aos produtos que estão acabando de seu estoque. <br> Para adicionar mais no sistema, utilize a mesma template de estoque APENAS com os produtos que irá acrescentar a ele.</p></div>',
+               f'<div style="border: solid 1px gray; width: 1000px; margin: 0 auto; background-color: white; box-shadow: 2px 2px #86868621"><header>',
+               yagmail.inline("./content/static/img/title.png"),
+               f'</header><section><article><h1>Estoque abaixo do limite</h1><div style="width: 100%;"><a style="width: 65%; padding-left: 3%;display: inline-block;position: relative;font-weight: bold;text-align: left;">Produto</a><a style="width: 12.5%; padding-left: 2.5%;display: inline-block;position: relative;font-weight: bold;text-align: left;">Quantidade</a><a style="width: 9%; padding-left: 1%;display: inline-block;position: relative;font-weight: bold;text-align: left;">Preço(un.)</a></div>',
                lista,
-               '<div style="border-top: 2px solid black"><p>Total: R$30,00</p></div></article></section></div><footer><p>Ward - Automated Billing Service</p><p>Av. Padre Cletus Francis Cox, 1661 - Country Club, Poços de Caldas - MG, 37714-620</p><p>Nos contate em labprojetospuc@gmail.com</p></footer></body></tml>']
+               f'</article></section></div><footer style="margin-top: 10px;color: rgb(143, 143, 143);font-family: sans-serif;"><p style="padding: 0px;margin: 5px;">Ward - Automated Billing Service</p><p style="padding: 0px;margin: 5px;">Av. Padre Cletus Francis Cox, 1661 - Country Club, Poços de Caldas - MG, 37714-620</p><p style="padding: 0px;margin: 5px;">Nos contate em labprojetospuc@gmail.com</p></footer></div>']
 
     with yagmail.SMTP(user, app_password) as yag:
         yag.send(to, subject, content)
@@ -266,14 +275,17 @@ def sendBillingMail(qr, client, user, product, total):
     list = ""
 
     for num in range(len(productList)):
-        lista = list + f'<span><p>{productList[num]}</p><i>{amountList[num]}</i><a>R${priceList[num]}</a></span>'
+        lista = list + \
+            f'<span style="border-bottom: 1px solid lightgray;display: inline-block;width: 100%;"><p style="text-align: left;display: inline-block;width: 70%;">{productList[num]}</p><i>{amountList[num]}</i><a style="text-align: right;display: inline-block;width: 15%;position: relative;">R${priceList[num]}</a></span>'
 
     subject = f'Cobrança à {user.name}'
-    content = ['<!DOChtml><tml lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta http-equiv="X-UA-Compatible" content="ie=edge"><style>body {text-align: center;background-color: #e1e1e1;}section {height: 800px;}footer {margin-top: 10px;color: rgb(143, 143, 143);font-family: sans-serif;}footer p {padding: 0px;margin: 5px;}article span p {text-align: left;display: inline-block;width: 70%;}article span a {text-align: right;display: inline-block;width: 15%;position: relative;}article span {border-bottom: 1px solid lightgray;display: inline-block;width: 100%;}article div {width: 100%;}article div p{width: 95%;text-align: right;font-family: sans-serif;font-size: large;font-weight: bold;}article div a {display: inline-block;position: relative;font-weight: bold;text-align: left;}</style></head><body><div>',
+    content = ['<div style="text-align: center;background-color: #e1e1e1;"><div>',
                f'<h2>Olá {client.name},</h2><p style="font-size: large">Este é um email referente à cobrança gerada por {user.name}. Em anexo segue o código pix referente ao valor de R${total}.</p></div>',
-               '<div style="border: solid 1px gray; width: 1000px; margin: 0 auto; background-color: white; box-shadow: 2px 2px #86868621"><header><img src="./content/static/img/title.png" alt="header" width="1000" height="100"></header><section><article><h1>Resumo da compra</h1><div><a style="width: 65%; padding-left: 3%">Produto</a><a style="width: 12.5%; padding-left: 2.5%">Quantidade</a><a style="width: 9%; padding-left: 1%">Preço(un.)</a></div>',
+               f'<div style="border: solid 1px gray; width: 1000px; margin: 0 auto; background-color: white; box-shadow: 2px 2px #86868621"><header>',
+               yagmail.inline("./content/static/img/title.png"),
+               f'</header><section><article><h1>Resumo da compra</h1><div style="width: 100%;"><a style="width: 65%; padding-left: 3%;display: inline-block;position: relative;font-weight: bold;text-align: left;">Produto</a><a style="width: 12.5%; padding-left: 2.5%;display: inline-block;position: relative;font-weight: bold;text-align: left;">Quantidade</a><a style="width: 9%; padding-left: 1%;display: inline-block;position: relative;font-weight: bold;text-align: left;">Preço(un.)</a></div>',
                lista,
-               f'<div style="border-top: 2px solid black"><p>Total: R${total}</p></div></article></section></div><footer><p>Ward - Automated Billing Service</p><p>Av. Padre Cletus Francis Cox, 1661 - Country Club, Poços de Caldas - MG, 37714-620</p><p>Nos contate em labprojetospuc@gmail.com</p></footer></body></tml>']
+               f'<div style="border-top: 2px solid black"><p style="width: 95%;text-align: right;font-family: sans-serif;font-size: large;font-weight: bold;">Total: R$30,00</p></div></article></section></div><footer style="margin-top: 10px;color: rgb(143, 143, 143);font-family: sans-serif;"><p style="padding: 0px;margin: 5px;">Ward - Automated Billing Service</p><p style="padding: 0px;margin: 5px;">Av. Padre Cletus Francis Cox, 1661 - Country Club, Poços de Caldas - MG, 37714-620</p><p style="padding: 0px;margin: 5px;">Nos contate em labprojetospuc@gmail.com</p></footer></div>']
     attachments = [qr]
 
     with yagmail.SMTP(userEmail, app_password) as yag:
@@ -282,23 +294,29 @@ def sendBillingMail(qr, client, user, product, total):
 
 
 # --------------- Rotina de Controle de Estoque ---------------
-# def checkStock():
-#     # Vai checar, para cada user, como estao os estoques
-#     connection = create_connection(
-#         "us-cdbr-east-06.cleardb.net", "b090112be85288", "2f84fdce", "heroku_7324e25c80c3d90")
-#     cursor = connection.cursor()
-#     stmt = ("SELECT product,amount,userEmail FROM stock,data WHERE amount = 0 group by product")
-#     cursor.execute(stmt)
-#     row = cursor.fetchall()
-#     for all in row:
-#         sendStockAlertMail(all[0], all[1], all[2])
+def checkStock():
+    # Vai checar, para cada user, como estao os estoques
+    connection = create_connection(
+        "us-cdbr-east-06.cleardb.net", "b090112be85288", "2f84fdce", "heroku_7324e25c80c3d90")
+    cursor = connection.cursor()
+    stmt = ("SELECT GROUP_CONCAT(price),GROUP_CONCAT(product),GROUP_CONCAT(amount),userEmail FROM stock,data WHERE amount = 0 group by product")
+    cursor.execute(stmt)
+    row = cursor.fetchall()
+    for all in row:
+        currentUser = User("null", all[3], "pix")
+        currentProduct = Product(all[1].split(
+            ','), all[2].split(','), all[0].split(','))
+        sendStockAlertMail(currentProduct, currentUser)
 
-#     stmt = ("SELECT product,amount,userEmail FROM stock,data WHERE amount = warning GROUP BY product,amount,userEmail")
-#     cursor.execute(stmt)
-#     row = cursor.fetchall()
-#     for all in row:
-#         sendStockAlertMail(all[0], all[1], all[2])
-#     cursor.close
+    stmt = ("SELECT GROUP_CONCAT(price),GROUP_CONCAT(product),GROUP_CONCAT(amount),userEmail FROM stock,data WHERE amount = warning GROUP BY product,amount,userEmail")
+    cursor.execute(stmt)
+    row = cursor.fetchall()
+    for all in row:
+        currentUser = User("null", all[3], "pix")
+        currentProduct = Product(all[1].split(
+            ','), all[2].split(','), all[0].split(','))
+        sendStockAlertMail(currentProduct, currentUser)
+    cursor.close
 
 # --------------- Controle de Rotinas ---------------
 
@@ -357,4 +375,3 @@ callDailyRoutines()
 #     readDataFile(sheet)
 # else:
 #     print('O arquivo não pode ser validado. Por favor utilize os templates disponíveis no github!')
-
