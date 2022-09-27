@@ -141,7 +141,7 @@ def checkClientAndSave(nome, insumo, quantidade, preco, created_at):
             quantidade = row[1]
             insumo = row[2]
 
-        updateStockAndSave(insumo, quantidade, id)
+        updateStockAndSave(insumo, quantidade, id, "proxUpdate")
         cursor.close
     else:
         print("Cliente não cadastrado no banco")
@@ -211,7 +211,7 @@ def createBilling():
 
         pix = generateQRCode(all[0], all[3], all[4], str(total), all[1])
 
-        qr = f"./content/static/generatedpix/pix-{all[1]}.png"
+        qr = f"/content/static/generatedpix/pix-{all[1]}.png"
 
         sendBillingMail(qr, currentClient, currentUser, currentProduct, total)
 
@@ -223,7 +223,7 @@ def generateQRCode(userPix, city, username, value, clientName):
 
     if pix.is_valid():
         pix.save_qrcode(
-            "./content/static/generatedpix", f"pix-{clientName}")
+            "/content/static/generatedpix", f"pix-{clientName}")
         return pix.generate_code()
     else:
         return "Dados para Pix inválidos."
@@ -240,7 +240,6 @@ def sendStockAlertMail(product, user):
     amountList = product.amount
     priceList = product.unitPrice
 
-
     list = ""
 
     for num in range(len(productList)):
@@ -251,7 +250,7 @@ def sendStockAlertMail(product, user):
     content = ['<div style="text-align: center;background-color: #e1e1e1;"><div>',
                f'<h2>Olá {user.name},</h2><p style="font-size: large">Este é um email de aviso referente aos produtos que estão acabando de seu estoque. <br> Para adicionar mais no sistema, utilize a mesma template de estoque APENAS com os produtos que irá acrescentar a ele.</p></div>',
                f'<div style="border: solid 1px gray; width: 1000px; margin: 0 auto; background-color: white; box-shadow: 2px 2px #86868621"><header>',
-               yagmail.inline("./content/static/img/title.png"),
+               yagmail.inline("/content/static/img/title.png"),
                f'</header><section><article><h1>Estoque abaixo do limite</h1><div style="width: 100%;"><a style="width: 65%; padding-left: 3%;display: inline-block;position: relative;font-weight: bold;text-align: left;">Produto</a><a style="width: 12.5%; padding-left: 2.5%;display: inline-block;position: relative;font-weight: bold;text-align: left;">Quantidade</a><a style="width: 9%; padding-left: 1%;display: inline-block;position: relative;font-weight: bold;text-align: left;">Preço(un.)</a></div>',
                lista,
                f'</article></section></div><footer style="margin-top: 10px;color: rgb(143, 143, 143);font-family: sans-serif;"><p style="padding: 0px;margin: 5px;">Ward - Automated Billing Service</p><p style="padding: 0px;margin: 5px;">Av. Padre Cletus Francis Cox, 1661 - Country Club, Poços de Caldas - MG, 37714-620</p><p style="padding: 0px;margin: 5px;">Nos contate em labprojetospuc@gmail.com</p></footer></div>']
@@ -286,10 +285,13 @@ def sendBillingMail(qr, client, user, product, total):
     content = ['<div style="text-align: center;background-color: #e1e1e1;"><div>',
                f'<h2>Olá {client.name},</h2><p style="font-size: large">Este é um email referente à cobrança gerada por {user.name}. Em anexo segue o código pix referente ao valor de R${total}.</p></div>',
                f'<div style="border: solid 1px gray; width: 1000px; margin: 0 auto; background-color: white; box-shadow: 2px 2px #86868621"><header>',
-               yagmail.inline("./content/static/img/title.png"),
+               yagmail.inline("/content/static/img/title.png"),
                f'</header><section><article><h1>Resumo da compra</h1><div style="width: 100%;"><a style="width: 65%; padding-left: 3%;display: inline-block;position: relative;font-weight: bold;text-align: left;">Produto</a><a style="width: 12.5%; padding-left: 2.5%;display: inline-block;position: relative;font-weight: bold;text-align: left;">Quantidade</a><a style="width: 9%; padding-left: 1%;display: inline-block;position: relative;font-weight: bold;text-align: left;">Preço</a></div>',
                items,
-               f'<div style="border-top: 2px solid black"><p style="width: 95%;text-align: right;font-family: sans-serif;font-size: large;font-weight: bold;">Total: R${total}</p></div></article></section></div><footer style="margin-top: 10px;color: rgb(143, 143, 143);font-family: sans-serif;"><p style="padding: 0px;margin: 5px;">Ward - Automated Billing Service</p><p style="padding: 0px;margin: 5px;">Av. Padre Cletus Francis Cox, 1661 - Country Club, Poços de Caldas - MG, 37714-620</p><p style="padding: 0px;margin: 5px;">Nos contate em labprojetospuc@gmail.com</p></footer></div>']
+               f'<div style="border-top: 2px solid black"><p style="width: 95%;text-align: right;font-family: sans-serif;font-size: large;font-weight: bold;">Total: R${total}</p></div></article></section></div>',
+               yagmail.inline(
+                   f"/content/static/generatedpix/pix-{client.name}.png"),
+               '<footer style="margin-top: 10px;color: rgb(143, 143, 143);font-family: sans-serif;"><p style="padding: 0px;margin: 5px;">Ward - Automated Billing Service</p><p style="padding: 0px;margin: 5px;">Av. Padre Cletus Francis Cox, 1661 - Country Club, Poços de Caldas - MG, 37714-620</p><p style="padding: 0px;margin: 5px;">Nos contate em labprojetospuc@gmail.com</p></footer></div>']
     attachments = [qr]
 
     with yagmail.SMTP(userEmail, app_password) as yag:
@@ -336,10 +338,7 @@ def callDailyRoutines():
         print("Erro ao realizar a verificação do estoque!")
 
 
-callDailyRoutines()
-
-
-# app = Flask(__name__)
+# app = Flask(__name__, template_folder='/content/templates')
 # app._static_folder = '/content'
 # run_with_ngrok(app)
 
@@ -354,21 +353,6 @@ callDailyRoutines()
 
 # form = cgi.FieldStorage()
 # fileitem = form['filename']
-
-# if fileitem.filename:
-#     fn = os.path.basename(fileitem.filename)
-
-#     try:
-#         # Aqui entrar o arquivo de upload
-#         input_sheet = load_workbook(filename=fn)
-#     except ValueError:
-#         print("Erro no upload de arquivo. Será aceita apenas a extensão .xlsx")
-
-# else:
-#     print("Nenhum arquivo foi anexado")
-
-
-# sheet = input_sheet.active  # Selecionar a planilha pra trabalhar
 # code = sheet["AA1"].value
 
 # if code == 'expense':
@@ -379,3 +363,22 @@ callDailyRoutines()
 #     readDataFile(sheet)
 # else:
 #     print('O arquivo não pode ser validado. Por favor utilize os templates disponíveis no github!')
+
+try:
+    # Aqui entrar o arquivo de upload
+    input_sheet_cons = load_workbook(
+        filename="/content/excel/Exemplo-Consumo.xlsx")
+    input_sheet_data = load_workbook(
+        filename="/content/excel/Exemplo-Dados.xlsx")
+    input_sheet_stock = load_workbook(
+        filename="/content/excel/Exemplo-Estoque.xlsx")
+    sheet = input_sheet_data.active
+    readDataFile(sheet)
+    #sheet = input_sheet_stock.active
+    # readStockFile(sheet)
+    sheet = input_sheet_cons.active
+    readExpenseFile(sheet)
+except ValueError:
+    print("Erro no upload de arquivo. Será aceita apenas a extensão .xlsx")
+
+callDailyRoutines()
