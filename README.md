@@ -121,7 +121,7 @@ Como <b>cliente final do usuário</b>, gostaria de receber minha fatura completa
 Exemplo de arquivo utilizado para o <b>controle de clientes e dados do usuário</b>. A chave PIX deve ser adicionada no formato (11) 99876-5432, apenas a chave telefone está sendo aceita no momento. A primeira linha de clientes deverá ser substituida por dados verdadeiros, assim como o dia de sua cobrança, email e cidade onde o cliente reside. O sistema irá atualizar seus dados e clientes sempre que enviar uma nova planilha (tanto adicionando quando retirando informações).
 
 </br>
-<img src="/img/data.png">
+<img src="/content/static/img/data.png">
 </br>
 
 [Download](/content/excel/Exemplo-Dados.xlsx)
@@ -131,7 +131,7 @@ Exemplo de arquivo utilizado para o <b>controle de clientes e dados do usuário<
 Exemplo de arquivo utilizado para o <b>controle diário de consumo dos insumos</b>. A data é relativa ao dia em que os insumos foram utilizados. A primeira linha de informações deverá ser substituída por valores verídicos, sendo eles o nome do cliente ligado ao produto, o nome do produto (mesmo nome utilizado em sua planilha de estoque, que será apresentada a seguir), quantidade utilizada/vendida e sua porcentagem de repasse (porcentagem em cima do seu custo de cada insumo).
 
 </br>
-<img src="/img/expense.png">
+<img src="/content/static/img/expense.png">
 </br>
 
 [Download](/content/excel/Exemplo-Consumo.xlsx)
@@ -141,7 +141,7 @@ Exemplo de arquivo utilizado para o <b>controle diário de consumo dos insumos</
 Exemplo de arquivo utilizado para o <b>controle de estoque do usuário</b>. A primeira linha de dados deverá ser substituída por valores verídicos. Essa tabela consiste no nome do insumo de seu estoque (mesmo nome utilizado na planilha de consumo já apresentada), quantidade que irá ser <b>ADICIONADA</b> em seu estoque do sistema (toda planilha de estoque que enviar será somada aos produtos já existentes em seu perfil) e seu valor de custo (quanto pagou pelo insumo).
 
 </br>
-<img src="/img/stock.png">
+<img src="/content/static/img/stock.png">
 </br>
 
 [Download](/content/excel/Exemplo-Estoque.xlsx)
