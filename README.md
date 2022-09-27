@@ -1,5 +1,5 @@
 # <p align="center"><b>Ward - Sistema de automação de faturamento.</b></p>
-  ![logo](/img/logo.png)
+  ![logo](/content/static/img/logo.png)
   
   
 ## Conteúdo
@@ -124,7 +124,7 @@ Exemplo de arquivo utilizado para o <b>controle de clientes e dados do usuário<
 <img src="/img/data.png">
 </br>
 
-[Download](/download/Exemplo-Dados.xlsx)
+[Download](/content/excel/Exemplo-Dados.xlsx)
 
 </br>
 
@@ -134,7 +134,7 @@ Exemplo de arquivo utilizado para o <b>controle diário de consumo dos insumos</
 <img src="/img/expense.png">
 </br>
 
-[Download](/download/Exemplo-Consumo.xlsx)
+[Download](/content/excel/Exemplo-Consumo.xlsx)
 
 </br>
 
@@ -144,4 +144,4 @@ Exemplo de arquivo utilizado para o <b>controle de estoque do usuário</b>. A pr
 <img src="/img/stock.png">
 </br>
 
-[Download](/download/Exemplo-Estoque.xlsx)
+[Download](/content/excel/Exemplo-Estoque.xlsx)
