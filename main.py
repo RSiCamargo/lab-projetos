@@ -1,22 +1,18 @@
-# !pip install mysql-connector-python
-# !pip install yagmail
-# !pip install pixqrcode
-# !pip install flask-ngrok
-# !pip install pillow
+# pip install mysql-connector-python
+# pip install yagmail
+# pip install pixqrcode
+# pip install pillow
+# pip install openpyxl
 
 from xml.etree.ElementTree import tostring
-from flask_ngrok import run_with_ngrok
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from pixqrcode import PixQrCode
 from openpyxl import load_workbook
 from mysql.connector import Error
 import yagmail
 import mysql.connector
 import datetime
-import cgi
 import os
-import cgitb
-cgitb.enable()
 
 
 class User:
@@ -88,8 +84,9 @@ def readDataFile(file):
 def updateUser(clientName, billingDay, email, city, userName, userPix, userEmail):
     connection = create_connection(
         "us-cdbr-east-06.cleardb.net", "b090112be85288", "2f84fdce", "heroku_7324e25c80c3d90")
-    # Salvar no banco as infos do usuário, e fazer o update da lista de clientes (trabalhar com tudo minusculo)
+
     print(f"O User {userName} com o Pix {userPix}, adicionou o cliente {clientName}, residente da cidade {city} e com email {email}, com faturamento agendado para o dia {billingDay}")
+
     cursor = connection.cursor()
     stmt = ("INSERT INTO data (clientName, billingDay, email, city, userName ,userPix, userEmail) VALUES (%s, %s, %s, %s, %s, %s, %s)")
     values = (clientName, billingDay, email,
@@ -178,6 +175,7 @@ def updateStockAndSave(insumo, quantidade, id, alerta, preco=0):
             f"Foi retirado {quantidade} unidades do insumo {insumo} no estoque")
 
 
+# ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # --------------- Rotina de Faturamento ---------------
 def createBilling():
     connection = create_connection(
@@ -338,47 +336,53 @@ def callDailyRoutines():
         print("Erro ao realizar a verificação do estoque!")
 
 
-# app = Flask(__name__, template_folder='/content/templates')
-# app._static_folder = '/content'
-# run_with_ngrok(app)
+# ---------------  Running Flask ---------------
+# Futuro: Pegar novo do usuario pela sessao/cadastro/etc... e adicionar ou novo do arquivo de upload
+app = Flask(__name__)
+app._static_folder = '../content'
+app.config['UPLOAD_FOLDER'] = "static/uploadedexcel/"
 
 
-# @app.route("/")
-# def home():
-#     return render_template('index.html')
+@app.route("/")
+def home():
+    return render_template('index.html')
 
 
-# app.run()
+@app.route('/upload', methods=['POST', 'GET'])
+def upload():
+    if request.method == 'POST':
+        f = request.files['file']
+        f.save(app.config['UPLOAD_FOLDER'] + f.filename)
+
+        try:
+            fn = "static/uploadedexcel/" + os.path.basename(f.filename)
+            input_sheet = load_workbook(fn)
+            sheet = input_sheet.active
+        except ValueError:
+            print("Erro no upload de arquivo. Será aceita apenas a extensão .xlsx")
+
+        code = sheet["AA1"].value
+        if code == 'expense':
+            # readExpenseFile(sheet)
+            return "readExpenseFile"
+        elif code == 'stock':
+            # readStockFile(sheet)
+            return "readStockFile"
+        elif code == 'dados':
+            # readDataFile(sheet)
+            return "readDataFile"
+        else:
+            print(
+                'O arquivo não pode ser validado. Por favor utilize os templates disponíveis no github!')
 
 
-# form = cgi.FieldStorage()
-# fileitem = form['filename']
-# code = sheet["AA1"].value
+@app.route('/daily', methods=['POST', 'GET'])
+def daily():
+    if request.method == 'POST':
+        return "Daily billing and stock check forced!!"
 
-# if code == 'expense':
-#     readExpenseFile(sheet)
-# elif code == 'stock':
-#     readStockFile(sheet)
-# elif code == 'dados':
-#     readDataFile(sheet)
-# else:
-#     print('O arquivo não pode ser validado. Por favor utilize os templates disponíveis no github!')
 
-try:
-    # Aqui entrar o arquivo de upload
-    input_sheet_cons = load_workbook(
-        filename="/content/excel/Exemplo-Consumo.xlsx")
-    input_sheet_data = load_workbook(
-        filename="/content/excel/Exemplo-Dados.xlsx")
-    input_sheet_stock = load_workbook(
-        filename="/content/excel/Exemplo-Estoque.xlsx")
-    sheet = input_sheet_data.active
-    readDataFile(sheet)
-    #sheet = input_sheet_stock.active
-    # readStockFile(sheet)
-    sheet = input_sheet_cons.active
-    readExpenseFile(sheet)
-except ValueError:
-    print("Erro no upload de arquivo. Será aceita apenas a extensão .xlsx")
+if __name__ == "__main__":
+    app.run()
 
-callDailyRoutines()
+# callDailyRoutines()
