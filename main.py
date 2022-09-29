@@ -14,6 +14,10 @@ import mysql.connector
 import datetime
 import os
 
+username = "Usuario Teste"
+
+# region Classes
+
 
 class User:
     def __init__(self, name, email, pix):
@@ -36,9 +40,11 @@ class Product:
         self.amount = amount
         self.unitPrice = unitPrice
 
+# endregion
 
+
+# region Banco
 # --------------- Cria a conexão com o banco de dados ---------------
-
 def create_connection(host_name, user_name, user_password, db_name):
     connection = None
     try:
@@ -54,9 +60,8 @@ def create_connection(host_name, user_name, user_password, db_name):
 
     return connection
 
+
 # --------------- Função para execução de single queries ---------------
-
-
 def execute_query(connection, query):
     cursor = connection.cursor()
     try:
@@ -66,14 +71,16 @@ def execute_query(connection, query):
     except Error as e:
         return False
 
+# endregion
 
-# --------------- Arquivo de Dados ---------------
+
+# region Consumo de Arquivos
+# --------------- Arquivos de Dados ---------------
 def readDataFile(file):
-    username = file["D3"].value
-    userEmail = file["D4"].value
-    userPix = file["D6"].value
+    userEmail = file["D3"].value
+    userPix = file["D5"].value
 
-    for value in file.iter_rows(min_row=9, min_col=3, max_col=7, values_only=True):
+    for value in file.iter_rows(min_row=8, min_col=3, max_col=7, values_only=True):
         if (value[0] != None):
             updateUser(value[0], value[2], value[3],
                        value[4], username, userPix, userEmail)
@@ -81,6 +88,26 @@ def readDataFile(file):
             break
 
 
+# --------------- Arquivo de Consumo ---------------
+def readExpenseFile(file):
+    date = file["D1"].value
+
+    for value in file.iter_rows(min_row=4, min_col=3, max_col=6, values_only=True):
+        if (value[0] != None):
+            checkClientAndSave(value[0], value[1], value[2], value[3], date)
+        else:
+            break
+
+
+# --------------- Arquivo de Estoque ---------------
+def readStockFile(file):
+    for value in file.iter_rows(min_row=4, min_col=3, max_col=6, values_only=True):
+        updateStockAndSave(value[0], value[1], id, value[3], value[2])
+
+# endregion
+
+
+# region Metodos
 def updateUser(clientName, billingDay, email, city, userName, userPix, userEmail):
     connection = create_connection(
         "us-cdbr-east-06.cleardb.net", "b090112be85288", "2f84fdce", "heroku_7324e25c80c3d90")
@@ -94,18 +121,6 @@ def updateUser(clientName, billingDay, email, city, userName, userPix, userEmail
     cursor.execute(stmt, values)
     connection.commit()
     cursor.close
-
-
-# --------------- Arquivo de Consumo ---------------
-
-def readExpenseFile(file):
-    date = file["D1"].value
-
-    for value in file.iter_rows(min_row=4, min_col=3, max_col=6, values_only=True):
-        if (value[0] != None):
-            checkClientAndSave(value[0], value[1], value[2], value[3], date)
-        else:
-            break
 
 
 def checkClientAndSave(nome, insumo, quantidade, preco, created_at):
@@ -144,12 +159,6 @@ def checkClientAndSave(nome, insumo, quantidade, preco, created_at):
         print("Cliente não cadastrado no banco")
 
 
-# --------------- Arquivo de Estoque ---------------
-def readStockFile(file):
-    for value in file.iter_rows(min_row=4, min_col=3, max_col=6, values_only=True):
-        updateStockAndSave(value[0], value[1], id, value[3], value[2])
-
-
 def updateStockAndSave(insumo, quantidade, id, alerta, preco=0):
     connection = create_connection(
         "us-cdbr-east-06.cleardb.net", "b090112be85288", "2f84fdce", "heroku_7324e25c80c3d90")
@@ -175,8 +184,13 @@ def updateStockAndSave(insumo, quantidade, id, alerta, preco=0):
             f"Foi retirado {quantidade} unidades do insumo {insumo} no estoque")
 
 
-# ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-# --------------- Rotina de Faturamento ---------------
+def cleanDatabase():
+    return
+
+# endregion
+
+
+# region Rotinas
 def createBilling():
     connection = create_connection(
         "us-cdbr-east-06.cleardb.net", "b090112be85288", "2f84fdce", "heroku_7324e25c80c3d90")
@@ -227,8 +241,35 @@ def generateQRCode(userPix, city, username, value, clientName):
         return "Dados para Pix inválidos."
 
 
-# --------------- Envio de Email ---------------
+def checkStock():
+    # Vai checar, para cada user, como estao os estoques
+    connection = create_connection(
+        "us-cdbr-east-06.cleardb.net", "b090112be85288", "2f84fdce", "heroku_7324e25c80c3d90")
+    cursor = connection.cursor()
+    stmt = ("SELECT GROUP_CONCAT(price),GROUP_CONCAT(product),GROUP_CONCAT(amount),userEmail,userName FROM stock,data WHERE amount = 0 group by product")
+    cursor.execute(stmt)
+    row = cursor.fetchall()
+    for all in row:
+        currentUser = User(all[4], all[3], "pix")
+        currentProduct = Product(all[1].split(
+            ','), all[2].split(','), all[0].split(','))
+        sendStockAlertMail(currentProduct, currentUser)
 
+    stmt = ("SELECT GROUP_CONCAT(price),GROUP_CONCAT(product),GROUP_CONCAT(amount),userEmail,userName FROM stock,data WHERE amount = warning GROUP BY product,amount,userEmail")
+    cursor.execute(stmt)
+    row = cursor.fetchall()
+    for all in row:
+        currentUser = User(all[4], all[3], "pix")
+        currentProduct = Product(all[1].split(
+            ','), all[2].split(','), all[0].split(','))
+        sendStockAlertMail(currentProduct, currentUser)
+    cursor.close
+
+# endregion
+
+
+# region Envio Email
+# --------------- Envio de Email ---------------
 def sendStockAlertMail(product, user):
     app_email = 'labprojetospuc@gmail.com'
     app_password = 'npfyvwfaljvlvplv'  # Token for gmail
@@ -296,44 +337,7 @@ def sendBillingMail(qr, client, user, product, total):
         yag.send(to, subject, content, attachments)
         print('Sent email successfully')
 
-
-# --------------- Rotina de Controle de Estoque ---------------
-def checkStock():
-    # Vai checar, para cada user, como estao os estoques
-    connection = create_connection(
-        "us-cdbr-east-06.cleardb.net", "b090112be85288", "2f84fdce", "heroku_7324e25c80c3d90")
-    cursor = connection.cursor()
-    stmt = ("SELECT GROUP_CONCAT(price),GROUP_CONCAT(product),GROUP_CONCAT(amount),userEmail,userName FROM stock,data WHERE amount = 0 group by product")
-    cursor.execute(stmt)
-    row = cursor.fetchall()
-    for all in row:
-        currentUser = User(all[4], all[3], "pix")
-        currentProduct = Product(all[1].split(
-            ','), all[2].split(','), all[0].split(','))
-        sendStockAlertMail(currentProduct, currentUser)
-
-    stmt = ("SELECT GROUP_CONCAT(price),GROUP_CONCAT(product),GROUP_CONCAT(amount),userEmail,userName FROM stock,data WHERE amount = warning GROUP BY product,amount,userEmail")
-    cursor.execute(stmt)
-    row = cursor.fetchall()
-    for all in row:
-        currentUser = User(all[4], all[3], "pix")
-        currentProduct = Product(all[1].split(
-            ','), all[2].split(','), all[0].split(','))
-        sendStockAlertMail(currentProduct, currentUser)
-    cursor.close
-
-# --------------- Controle de Rotinas ---------------
-
-
-def callDailyRoutines():
-    try:
-        createBilling()
-    except ValueError:
-        print("Erro ao gerar faturamento!")
-    try:
-        checkStock()
-    except ValueError:
-        print("Erro ao realizar a verificação do estoque!")
+# endregion
 
 
 # ---------------  Running Flask ---------------
@@ -363,26 +367,37 @@ def upload():
 
         code = sheet["AA1"].value
         if code == 'expense':
-            # readExpenseFile(sheet)
-            return "readExpenseFile"
+            readExpenseFile(sheet)
+            return "Upload do arquivo de consumo efetuado com sucesso!"
         elif code == 'stock':
-            # readStockFile(sheet)
-            return "readStockFile"
+            readStockFile(sheet)
+            return "Upload do arquivo de estoque efetuado com sucesso!"
         elif code == 'dados':
-            # readDataFile(sheet)
-            return "readDataFile"
+            readDataFile(sheet)
+            return "Upload do arquivo de dados efetuado com sucesso!"
         else:
-            print(
-                'O arquivo não pode ser validado. Por favor utilize os templates disponíveis no github!')
+            return 'O arquivo não pode ser validado. Por favor utilize os templates disponíveis no github!'
 
 
 @app.route('/daily', methods=['POST', 'GET'])
 def daily():
     if request.method == 'POST':
-        return "Daily billing and stock check forced!!"
+        if request.form['help'] == 'Call Routines':
+            try:
+                # createBilling()
+                return "Create Billing"
+            except ValueError:
+                print("Erro ao gerar faturamento!")
+            try:
+                # checkStock()
+                return "Check Stock"
+            except ValueError:
+                print("Erro ao realizar a verificação do estoque!")
+
+        elif request.form['help'] == 'Clean DB':
+            cleanDatabase()
+            return "Dados de teste excluidos do DB"
 
 
 if __name__ == "__main__":
     app.run()
-
-# callDailyRoutines()
