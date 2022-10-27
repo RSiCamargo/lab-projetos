@@ -36,3 +36,7 @@ def editProduct():
 
 def checkStockLimits():
     return (True)
+
+
+def importStock():
+    return (True)

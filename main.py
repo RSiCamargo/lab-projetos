@@ -19,7 +19,7 @@ import scripts.cache as ch
 import scripts.stock as st
 
 username = "Usuario Teste"
-# Chaves Cache: User_key, Client_"client cpf", Product_"product name"
+# Chaves Cache: User_key, Client_"client cpf", Product_"product name", Billing_"client cpf"
 
 
 class User:
@@ -31,7 +31,7 @@ class User:
 
 
 class Client:
-    def __init__(self, name, surname, cpf, email, fone, date, status, expense=[]):
+    def __init__(self, name, surname, cpf, email, fone, date, status, expense):
         self.name = name
         self.surname = surname
         self.cpf = cpf
@@ -39,14 +39,18 @@ class Client:
         self.fone = fone
         self.date = date
         self.status = status
-        self.expense = []
+        self.expense = expense
 
 
-class Product:
-    def __init__(self, name, amount, unitPrice):
+class Billings:
+    def __init__(self, name, cpf, email, title, body, day):
         self.name = name
-        self.amount = amount
-        self.unitPrice = unitPrice
+        self.cpf = cpf
+        self.email = email
+        self.title = title
+        self.body = body
+        self.day = day
+
 
 #! --------------------------------------------------------------------------------------------------------------------------------
 
@@ -120,11 +124,11 @@ def addExpense():
 
     results = ch.load(key)
     client = Client(results.name, results.surname, results.cpf,
-                    results.email, results.tel, results.date, results.status)
+                    results.email, results.tel, results.date, results.status, results.expense)
 
-    newExpenses = []  # Pegar do front as tuplas produto/valor, e adicionar.
+    newExpenses = {}  # Pegar do front o dict produto/valor, e adicionar.
     client.expense.append(newExpenses)
-    ch.save
+    ch.save(key, client)
 
 
 # ? Estoque
@@ -153,19 +157,37 @@ def loadClientBilling():
         for client in results:
             print(client.cpf)
     else:
-        # Adicionar no front o nome e cpf do cliente desejado
+        # Adicionar no front o nome, cpf e email do cliente desejado
         print(True)
 
+    # Arrumar
+    client = Client(results.name, results.surname, results.cpf,
+                    results.email, results.tel, results.date, results.status, results.expense)
 
-# Pegar do front:
-emailTitle = ""
-emailBody = ""
-emailEnd = ""
 
-bill.createBilling(emailTitle, emailBody, emailEnd)
+def scheduleBilling():
+    # Pegar do front:
+    clientName = ""
+    clientCpf = ""
+    billingDay = ""
+    email = ""
+    emailTitle = ""
+    emailBody = ""
 
+    newBilling = Billings(clientName, clientCpf, email,
+                          emailTitle, emailBody, billingDay)
+
+    key = "Billing_" + clientCpf.replace('.', '-')
+    ch.save(key, newBilling)
+
+
+# ? Scheduler
+    # Rodar diariamente
+    currentDay = ""
+    bill.createBilling(currentDay)
 
 # ? Agenda (Por último, caso dê tempo)
+
 
 #! --------------------------------------------------------------------------------------------------------------------------------
 # ---------------  Running Flask ---------------
