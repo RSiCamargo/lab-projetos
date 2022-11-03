@@ -1,8 +1,8 @@
 from pixqrcode import PixQrCode
 
 
-def generateQRCode(userPix, city, username, value, clientName):
-    pix = PixQrCode(username, userPix, city, value)
+def generateQRCode(user, clientName, value):
+    pix = PixQrCode(user.name, user.tel, user.city, value)
 
     if pix.is_valid():
         pix.save_qrcode(

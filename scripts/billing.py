@@ -1,5 +1,7 @@
 import scripts.emails as mail
 import scripts.qrcode as qr
+import scripts.cache as ch
+import scripts.stock as st
 
 
 # def createBilling():
@@ -42,5 +44,35 @@ import scripts.qrcode as qr
 
 #     print("Fechando Faturamento")
 
-def createBilling(title, body, end):
-    return (True)
+class Product:
+    def __init__(self, name, amount, unitPrice):
+        self.name = name
+        self.amount = amount
+        self.unitPrice = unitPrice
+
+
+def createBilling(currentDay):
+    billings = ch.loadAll("Billings_")
+    products = []
+    stock = st.importStock()
+
+    user = ch.load("User_key")
+
+    for day in billings.day:
+        total = 0
+        if (day == currentDay):
+            key = "Client_" + billings.cpf.replace('.', '-')
+            client = ch.load(key)
+
+            for a, b in client.expense:
+                for name, price in stock:
+                    if name == a:
+                        c = price
+
+                total = total + b * c
+                products.append(Product(a, b, c))
+
+            pix = qr.generateQRCode(user, client.name, str(total))
+            qr = f"./static/generatedpix/pix-{client.name}.png"
+
+            mail.sendBillingMail(qr, billings, products, total)

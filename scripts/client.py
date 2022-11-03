@@ -2,7 +2,11 @@ import scripts.cache as ch
 
 
 def checkClient(key):
-    response = ch.load(key)
+    try:
+        response = ch.load(key)
+    except Exception as ex:
+        print("Erro durante salvamento de dados: ", ex)
+
     return response != False
 
 
