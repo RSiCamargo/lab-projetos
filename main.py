@@ -21,6 +21,11 @@ import scripts.stock as st
 username = "Usuario Teste"
 # Chaves Cache: User_key, Client_"client cpf", Product_"product name", Billing_"client cpf"
 
+name = ''
+email = ''
+tel = ''
+city = ''
+
 
 class User:
     def __init__(self, name, email, tel, city):
@@ -54,28 +59,13 @@ class Billings:
 
 #! --------------------------------------------------------------------------------------------------------------------------------
 # ? Dados do Usuário
-def configUser():
-    # Pegar do front:
-    name = ""
-    email = ""
-    tel = ""
-    city = ""
-
+def configUser(name, email, tel, city):
     user = User(name, email, tel, city)
     ch.save("User_key", user)
 
 
 # ? Cadastrar Cliente
-def configClient():
-    # Pegar do front:
-    name = ""
-    surname = ""
-    cpf = ""
-    email = ""
-    tel = ""
-    date = ""
-    status = True
-
+def configClient(name, surname, cpf, email, tel, date, status):
     key = "Client_" + cpf.replace('.', '-')
 
     client = Client(name, surname, cpf, email, tel, date, status)
@@ -83,13 +73,6 @@ def configClient():
     response = cl.checkClient(key)
     if (response):
         ch.save(key, client)
-
-
-# ? Listagem de Clientes
-def listAllClients():
-    clients = cl.clientList()
-
-    # Criar elemento html (Esperar front para sincronizar formatação da tabela)
 
 
 # ? Registrar Consumo
@@ -131,10 +114,10 @@ def addExpense():
 
 # ? Estoque
 # Ver como estara o front para fazer as interações
-st.addProduct()
-st.removeProduct()
-st.editProduct()
-st.checkStock()
+# st.addProduct()
+# st.removeProduct()
+# st.editProduct()
+# st.checkStock()
 
 
 # ? Editar Faturamento
@@ -192,59 +175,125 @@ def scheduleBilling():
 # Futuro: Pegar novo do usuario pela sessao/cadastro/etc... e adicionar ou novo do arquivo de upload
 app = Flask(__name__)
 app._static_folder = '../content'
-app.config['UPLOAD_FOLDER'] = "static/uploadedexcel/"
+#app.config['UPLOAD_FOLDER'] = "static/uploadedexcel/"
 
 
 @app.route("/")
 def home():
-    return render_template('index.html', username=username)
+    return render_template('home.html')
 
 
-@app.route('/upload', methods=['POST', 'GET'])
-def upload():
+@app.route('/user', methods=['POST', 'GET'])
+def user():
     if request.method == 'POST':
-        f = request.files['file']
-        f.save(app.config['UPLOAD_FOLDER'] + f.filename)
+        name = request.form.get("name", "")
+        email = request.form.get("email", "")
+        tel = request.form.get("tel", "")
+        city = request.form.get("city", "")
 
-        try:
-            fn = "static/uploadedexcel/" + os.path.basename(f.filename)
-            input_sheet = load_workbook(fn)
-            sheet = input_sheet.active
-        except ValueError:
-            print("Erro no upload de arquivo. Será aceita apenas a extensão .xlsx")
+        configUser(name, email, tel, city)
 
-        code = sheet["AA1"].value
-        if code == 'expense':
-            readExpenseFile(sheet)
-            return "Upload do arquivo de consumo efetuado com sucesso!"
-        elif code == 'stock':
-            readStockFile(sheet)
-            return "Upload do arquivo de estoque efetuado com sucesso!"
-        elif code == 'dados':
-            readDataFile(sheet)
-            return "Upload do arquivo de dados efetuado com sucesso!"
-        else:
-            return 'O arquivo não pode ser validado. Por favor utilize os templates disponíveis no github!'
+    user = ch.load("User_key")
+
+    name = user.name
+    email = user.email
+    tel = user.tel
+    city = user.city
+
+    return render_template('user.html', name=name, email=email, tel=tel, city=city)
 
 
-@app.route('/daily', methods=['POST', 'GET'])
-def daily():
+@app.route('/client', methods=['POST', 'GET'])
+def client():
     if request.method == 'POST':
-        if request.form['help'] == 'Call Routines':
-            try:
-                createBilling()
-            except ValueError:
-                return "Erro ao gerar faturamento!"
-            try:
-                checkStock()
-            except ValueError:
-                return "Erro ao realizar a verificação do estoque!"
+        name = request.form.get("name", "")
+        surname = request.form.get("surname", "")
+        cpf = request.form.get("cpf", "")
+        email = request.form.get("email", "")
+        tel = request.form.get("tel", "")
+        date = request.form.get("date", "")
+        status = request.form.get("status", "")
 
-            return "Faturamento e checagem de estoque rodados com sucesso!!"
-        elif request.form['help'] == 'Clean DB':
-            cleanDatabase()
-            return "Dados de teste excluidos do DB"
+        configClient(name, surname, cpf, email, tel, date, status)
+
+    return render_template('client.html')
 
 
+@app.route('/listClients', methods=['POST', 'GET'])
+def listClient():
+    clients = cl.clientList()
+    clientsTable = ''
+
+    for cl in clients:
+        clientsTable = clientsTable + \
+            f"<tr><td>{clients.index(cl) + 1}</td><td>{cl.name}</td><td>{cl.date}</td><td>{cl.status}</td></tr>"
+
+    return render_template('listClients.html', clientsTable=clientsTable)
+
+
+@app.route('/expense', methods=['POST', 'GET'])
+def expense():
+    return render_template('expense.html')
+
+
+@app.route('/stock', methods=['POST', 'GET'])
+def stock():
+    return render_template('stock.html')
+
+
+@app.route('/listStock', methods=['POST', 'GET'])
+def listStock():
+    return render_template('listStock.html')
+
+
+@app.route('/email', methods=['POST', 'GET'])
+def email():
+    return render_template('email.html')
+
+
+# @app.route('/upload', methods=['POST', 'GET'])
+# def upload():
+#     if request.method == 'POST':
+#         f = request.files['file']
+#         f.save(app.config['UPLOAD_FOLDER'] + f.filename)
+
+#         try:
+#             fn = "static/uploadedexcel/" + os.path.basename(f.filename)
+#             input_sheet = load_workbook(fn)
+#             sheet = input_sheet.active
+#         except ValueError:
+#             print("Erro no upload de arquivo. Será aceita apenas a extensão .xlsx")
+
+#         code = sheet["AA1"].value
+#         if code == 'expense':
+#             readExpenseFile(sheet)
+#             return "Upload do arquivo de consumo efetuado com sucesso!"
+#         elif code == 'stock':
+#             readStockFile(sheet)
+#             return "Upload do arquivo de estoque efetuado com sucesso!"
+#         elif code == 'dados':
+#             readDataFile(sheet)
+#             return "Upload do arquivo de dados efetuado com sucesso!"
+#         else:
+#             return 'O arquivo não pode ser validado. Por favor utilize os templates disponíveis no github!'
+
+
+# @app.route('/daily', methods=['POST', 'GET'])
+# def daily():
+#     if request.method == 'POST':
+#         if request.form['help'] == 'Call Routines':
+#             try:
+#                 createBilling()
+#             except ValueError:
+#                 return "Erro ao gerar faturamento!"
+#             try:
+#                 checkStock()
+#             except ValueError:
+#                 return "Erro ao realizar a verificação do estoque!"
+
+#             return "Faturamento e checagem de estoque rodados com sucesso!!"
+#         elif request.form['help'] == 'Clean DB':
+#             cleanDatabase()
+#             return "Dados de teste excluidos do DB"
 if __name__ == "__main__":
     app.run()
