@@ -7,18 +7,15 @@
 - [ Autores ](#autores)
 - [ Histórias dos usuários ](#hist)
 - [ Diagrama UML ](#uml)
-- [ Formatos de Arquivo ](#excel)
 
 
 <a name="desc"></a>
 ## Descrição
 
-O projeto tem a ideia de construir uma API visando a automação no processo de criação e fechamento de faturas de microempresas ou profissionais autônomos, buscando a economia de tempo e eficiência, para assim gerar mais produtividade a essas entidades. Também garantindo que o cliente final receba sua cobrança de forma simples, rápida e em dia.
+O projeto tem a ideia de construir um sistema visando a automação no processo de criação e fechamento de faturas de microempresas ou profissionais autônomos, buscando a economia de tempo e eficiência, para assim gerar mais produtividade a essas entidades. Também garantindo que o cliente final receba sua cobrança de forma simples, rápida e em dia.
 
 
-A automação consiste no consumo de um arquivo de excel base, onde o usuário irá definir quais os insumos, produtos ou qualquer outros materiais presentes em seu estoque, com seus devidos preços de custo. Em seguida, o usuário poderá subir outros arquivos com os itens que estão sendo consumidos, para cada um de seus clientes. Dessa forma, o sistema irá atualizar seu estoque e, ao final da data de fechamento de fatura (escolhida pelo usuário), irá enviar a fatura completa para cada um dos clientes propostos pelo usuário.
-
-Todos os formatos de envio de arquivo excel estão disponíveis em seguida.
+A automação consiste no cadastro de informações de consumo pelo usuário do sistema, onde ele irá definir quais os insumos, produtos ou qualquer outro material presente em seu estoque, com seus devidos preços de custo. Ele poderá também realizar o cadastro de seus clientes e os produtos de seus estoques. Dessa forma, o sistema irá atualizar seu estoque e, ao final da data de fechamento de fatura (escolhida pelo usuário), irá enviar a fatura completa para cada um dos clientes propostos pelo usuário. O usuário terá a opção de editar o corpo do email a ser enviado para seus clientes.
 
 
 <a name="autores"></a>
@@ -31,7 +28,7 @@ Todos os formatos de envio de arquivo excel estão disponíveis em seguida.
 <a name="hist"></a>
 ## Histórias dos usuários
 
-Como <b>administrador do processo</b>, eu quero que a API execute as requisições feitas pelos usuários de forma adequada, chamando os processos adequados para cada requisição, e retornando os valores de acordo, para que, no final dos períodos propostos, os faturamentos sejam gerados de forma consistente.
+Como <b>administrador do processo</b>, eu quero que o sistema execute as requisições feitas pelos usuários de forma adequada, chamando os processos adequados para cada requisição, e retornando os valores de acordo, para que, no final dos períodos propostos, os faturamentos sejam gerados de forma consistente.
 
 #### Critérios de aceitação:
 - As requisições devem ser feitas de acordo com as solicitações.
@@ -45,10 +42,10 @@ Como <b>administrador do processo</b>, eu quero que a API execute as requisiçõ
 </br>
 </br>
 
-Como <b>usuário do sistema</b>, eu gostaria que o sistema consumisse todos os dados enviados pelo excel, uma vez respeitando todos os critérios disponíveis e por fim, associando esses dados ao meu perfil para que eu seja capaz de manter em ordem todo o meu inventário.
+Como <b>usuário do sistema</b>, eu gostaria que o sistema lidasse com todos os dados enviados pelos inputs, uma vez respeitando todos os critérios disponíveis e por fim, associando esses dados ao meu perfil para que eu seja capaz de manter em ordem todo o meu inventário.
 
 #### Critérios de aceitação:
-- O excel deve ser consumido armazenando todas as informações em seus devidos locais.
+- Os dados compostos nos inputs devem ser consumidos armazenando todas as informações em seus devidos locais.
 - As informações devem ser associadas ao perfil do usuário identificado.
 
 #### Story Points: 3
@@ -56,11 +53,11 @@ Como <b>usuário do sistema</b>, eu gostaria que o sistema consumisse todos os d
 </br>
 </br>
 
-Como <b>usuário do sistema</b>, gostaria que conforme forem enviados arquivos contendo o consumo do meu estoque (para cada cliente), o sistema trate de forma adequada o fluxo de insumos para o faturamento, e atualize meu estoque.
+Como <b>usuário do sistema</b>, gostaria que conforme forem enviados dados contendo o consumo do meu estoque (para cada cliente), o sistema trate de forma adequada o fluxo de insumos para o faturamento, e atualize meu estoque.
 
 #### Critérios de aceitação:
-- O excel deve ser consumido armazenando todas as informações em seus devidos locais.
-- O estoque do usuário deverá ser atualizado de acordo com a utilização dos insumos declarados no excel.
+- Os dados devem ser consumidos armazenando todas as informações em seus devidos locais.
+- O estoque do usuário deverá ser atualizado de acordo com a utilização dos insumos inseridos previamente pelo sistema.
 
 #### Story Points: 2
 
@@ -112,36 +109,4 @@ Como <b>cliente final do usuário</b>, gostaria de receber minha fatura completa
 <a name="uml"></a>
 ## Diagrama UML
 
-![Diagrama UML](/img/diagrama.png)
-
-
-<a name="excel"></a>
-## Planilhas a serem utilizadas
-
-Exemplo de arquivo utilizado para o <b>controle de clientes e dados do usuário</b>. A chave PIX deve ser adicionada no formato (11) 99876-5432, apenas a chave telefone está sendo aceita no momento. A primeira linha de clientes deverá ser substituida por dados verdadeiros, assim como o dia de sua cobrança, email e cidade onde o cliente reside. O sistema irá atualizar seus dados e clientes sempre que enviar uma nova planilha (tanto adicionando quando retirando informações).
-
-</br>
-<img src="/static/img/data.png">
-</br>
-
-[Download](/excel/Exemplo-Dados.xlsx)
-
-</br>
-
-Exemplo de arquivo utilizado para o <b>controle diário de consumo dos insumos</b>. A data é relativa ao dia em que os insumos foram utilizados. A primeira linha de informações deverá ser substituída por valores verídicos, sendo eles o nome do cliente ligado ao produto, o nome do produto (mesmo nome utilizado em sua planilha de estoque, que será apresentada a seguir), quantidade utilizada/vendida e sua porcentagem de repasse (porcentagem em cima do seu custo de cada insumo).
-
-</br>
-<img src="static/img/stock.png">
-</br>
-
-[Download](excel/Exemplo-Consumo.xlsx)
-
-</br>
-
-Exemplo de arquivo utilizado para o <b>controle de estoque do usuário</b>. A primeira linha de dados deverá ser substituída por valores verídicos. Essa tabela consiste no nome do insumo de seu estoque (mesmo nome utilizado na planilha de consumo já apresentada), quantidade que irá ser <b>ADICIONADA</b> em seu estoque do sistema (toda planilha de estoque que enviar será somada aos produtos já existentes em seu perfil) e seu valor de custo (quanto pagou pelo insumo).
-
-</br>
-<img src="/static/img/expense.png">
-</br>
-
-[Download](/excel/Exemplo-Estoque.xlsx)
+![Diagrama UML](/static/img/diagrama2.png)
