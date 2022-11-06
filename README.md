@@ -110,4 +110,4 @@ Como <b>cliente final do usuário</b>, gostaria de receber minha fatura completa
 <a name="uml"></a>
 ## Diagrama UML
 
-![Diagrama UML](/static/img/diagrama.png)
+![Diagrama UML](/static/img/diagrama2.png)
