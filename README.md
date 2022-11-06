@@ -7,7 +7,6 @@
 - [ Autores ](#autores)
 - [ Histórias dos usuários ](#hist)
 - [ Diagrama UML ](#uml)
-- [ Formatos de Arquivo ](#excel)
 
 
 <a name="desc"></a>
