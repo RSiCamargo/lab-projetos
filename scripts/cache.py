@@ -1,4 +1,4 @@
-from nis import cat
+# from nis import cat
 from sqlitedict import SqliteDict
 
 

@@ -174,13 +174,17 @@ def scheduleBilling():
 # ---------------  Running Flask ---------------
 # Futuro: Pegar novo do usuario pela sessao/cadastro/etc... e adicionar ou novo do arquivo de upload
 app = Flask(__name__)
-app._static_folder = '../content'
+# app._static_folder = '../content'
+app.config['UPLOAD_FOLDER'] = "static/img/"
 #app.config['UPLOAD_FOLDER'] = "static/uploadedexcel/"
 
 
 @app.route("/")
 def home():
-    return render_template('home.html')
+    full_filename = os.path.join(app.config['UPLOAD_FOLDER'], 'title.png')
+    return render_template('home.html', image=full_filename)
+
+
 
 
 @app.route('/user', methods=['POST', 'GET'])
@@ -295,5 +299,6 @@ def email():
 #         elif request.form['help'] == 'Clean DB':
 #             cleanDatabase()
 #             return "Dados de teste excluidos do DB"
+
 if __name__ == "__main__":
     app.run()
