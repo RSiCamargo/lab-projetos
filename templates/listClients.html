@@ -29,7 +29,7 @@
                 </thead>
                 <tbody>
                     {% for client in clients %}
-                        <tr><td class="align-middle">{{clients.index(client)}}</td><td class="align-middle">{{client.name}}</td><td class="align-middle">{{client.date}}</td><td class="align-middle">{{'Ativo' if(client.status == True) else 'Inativo'}}</td><td><button type="submit" name="delete" value="{{client.cpf}}" class="text-center btn btn-link"><i class="fa-solid fa-trash"></i></button></td></tr>
+                        <tr><td class="align-middle">{{clients.index(client)}}</td><td class="align-middle">{{client.name}}</td><td class="align-middle">{{client.date}}</td><td class="align-middle">{{'Ativo' if(client.status == "ativo") else 'Inativo'}}</td><td><button type="submit" name="delete" value="{{client.cpf}}" class="text-center btn btn-link"><i class="fa-solid fa-trash"></i></button></td></tr>
                     {% endfor %}
                 </tbody>
               </table>

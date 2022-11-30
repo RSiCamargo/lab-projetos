@@ -91,7 +91,7 @@ def addExpense(cpf, product, qnt):
         #! Add alerta
         return
 
-    if (stockProduct.qnt < int(qnt)):
+    if (int(stockProduct.qnt) < int(qnt)):
         #! Add alerta
         return
 
@@ -101,6 +101,9 @@ def addExpense(cpf, product, qnt):
     newExpenses = {
         stockProduct.product: qnt
     }
+
+    stockProduct.qnt = int(stockProduct.qnt) - int(qnt)
+    ch.save(pKey, stockProduct)
 
     client.expense.append(newExpenses)
     ch.save(key, client)
