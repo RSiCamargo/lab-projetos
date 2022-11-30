@@ -26,6 +26,9 @@ name = ''
 email = ''
 tel = ''
 city = ''
+type = ''
+message = ''
+alert = 'none'
 
 
 class User:
@@ -88,12 +91,10 @@ def addExpense(cpf, product, qnt):
     if (exist):
         stockProduct = ch.load(pKey)
     else:
-        #! Add alerta
-        return
+        return 1
 
     if (int(stockProduct.qnt) < int(qnt)):
-        #! Add alerta
-        return
+        return 2
 
     key = "Client_" + cpf.replace('.', '').replace('-', '')
     client = ch.load(key)
@@ -107,6 +108,8 @@ def addExpense(cpf, product, qnt):
 
     client.expense.append(newExpenses)
     ch.save(key, client)
+    alert = 'none'
+    return 0
 
 
 # ? Estoque
@@ -193,16 +196,31 @@ def listClient():
 
 @app.route('/expense', methods=['POST', 'GET'])
 def expense():
+    alert = 'none'
+    message = 'none'
+    type = 'success'
     if request.method == 'POST':
         cpf = request.form.get("name", "")
         product = request.form.get("product", "")
         qnt = request.form.get("qnt", "")
 
-        addExpense(cpf, product, qnt)
+        if(addExpense(cpf, product, qnt) == 1):
+            alert = 'block'
+            message = 'Produto não existe!'
+            type = 'danger'
+        elif(addExpense(cpf, product, qnt) == 2):
+            alert = 'block'
+            message = 'Quantidade superior ao estoque!'
+            type = 'danger'
+        else:
+            alert = 'block'
+            message = 'Consumo cadastrado!'
+            type = 'success'
+
 
     clients = cl.clientList()
 
-    return render_template('expense.html', clients=clients)
+    return render_template('expense.html', clients=clients, alert=alert, message=message, type=type)
 
 
 @app.route('/stock', methods=['POST', 'GET'])
