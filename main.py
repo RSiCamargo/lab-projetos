@@ -7,19 +7,20 @@
 # pip install sqlitedict
 
 from xml.etree.ElementTree import tostring
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for
 from flask_bootstrap import Bootstrap
 import datetime
 import os
 
 # Scripts
+import pandas as pd
 import scripts.client as cl
 import scripts.billing as bill
 import scripts.cache as ch
 import scripts.stock as st
 
 username = "Usuario Teste"
-# Chaves Cache: User_key, Client_"client cpf", Product_"product name", Billing_"client cpf"
+# Chaves Cache: User_key, Client_"client cpf", Product_"product name", Mail_"client cpf"
 
 name = ''
 email = ''
@@ -36,135 +37,92 @@ class User:
 
 
 class Client:
-    def __init__(self, name, surname, cpf, email, fone, date, status, expense):
+    def __init__(self, name, surname, cpf, email, fone, date, discount, status, expense=[], title="", body=""):
         self.name = name
         self.surname = surname
         self.cpf = cpf
         self.email = email
         self.fone = fone
         self.date = date
+        self.discount = discount
         self.status = status
         self.expense = expense
-
-
-class Billings:
-    def __init__(self, name, cpf, email, title, body, day):
-        self.name = name
-        self.cpf = cpf
-        self.email = email
         self.title = title
         self.body = body
-        self.day = day
+
+
+class Product:
+    def __init__(self, product, qnt, cost, price, alert):
+        self.product = product
+        self.qnt = qnt
+        self.cost = cost
+        self.price = price
+        self.alert = alert
 
 
 #! --------------------------------------------------------------------------------------------------------------------------------
 # ? Dados do Usuário
+
+
 def configUser(name, email, tel, city):
     user = User(name, email, tel, city)
     ch.save("User_key", user)
 
 
 # ? Cadastrar Cliente
-def configClient(name, surname, cpf, email, tel, date, status):
-    key = "Client_" + cpf.replace('.', '-')
+def configClient(name, surname, cpf, email, tel, date, discount, status):
+    key = "Client_" + cpf.replace('.', '').replace('-', '')
 
-    client = Client(name, surname, cpf, email, tel, date, status)
+    client = Client(name, surname, cpf, email, tel, date, discount, status)
 
-    response = cl.checkClient(key)
-    if (response):
+    exist = cl.checkClient(key)
+    if (not exist):
         ch.save(key, client)
 
 
 # ? Registrar Consumo
-def loadClientExpense():
-    # Da pra alterar a funcao pra escolher o cliente direto na caixa de texto (Esperar Front)
+def addExpense(cpf, product, qnt):
+    pKey = "Product_" + product.lower()
 
-    # Pegar do front:
-    clientName = ""
-    clientCpf = ""
-
-    # Add busca por cpf
-    results = cl.findByName(clientName)
-    if len(results) == 0:
-        # alerta cliente não existe
-        print(True)
-    elif len(results) > 1:
-        # alerta pedindo pra preencher o cpf do desejado (listar os cpfs)
-        for client in results:
-            print(client.cpf)
+    exist = st.checkProduct(pKey)
+    if (exist):
+        stockProduct = ch.load(pKey)
     else:
-        # Adicionar no front o nome e cpf do cliente desejado
-        print(True)
+        #! Add alerta
+        return
 
+    if (stockProduct.qnt < int(qnt)):
+        #! Add alerta
+        return
 
-def addExpense():
-    # Pegar do front:
-    clientCpf = ""
+    key = "Client_" + cpf.replace('.', '').replace('-', '')
+    client = ch.load(key)
 
-    key = "Client_" + clientCpf.replace('.', '-')
+    newExpenses = {
+        stockProduct.product: qnt
+    }
 
-    results = ch.load(key)
-    client = Client(results.name, results.surname, results.cpf,
-                    results.email, results.tel, results.date, results.status, results.expense)
-
-    newExpenses = {}  # Pegar do front o dict produto/valor, e adicionar.
     client.expense.append(newExpenses)
     ch.save(key, client)
 
 
 # ? Estoque
-# Ver como estara o front para fazer as interações
-# st.addProduct()
-# st.removeProduct()
-# st.editProduct()
-# st.checkStock()
+def configProduct(product, qnt, cost, price, alert):
+    key = "Product_" + product.lower()
 
+    product = Product(product.lower(), qnt, cost, price, alert)
 
-# ? Editar Faturamento
-def loadClientBilling():
-    # Da pra alterar a funcao pra escolher o cliente direto na caixa de texto (Esperar Front)
-
-    # Pegar do front:
-    clientName = ""
-    clientCpf = ""
-
-    # Add busca por cpf
-    results = cl.findByName(clientName)
-    if len(results) == 0:
-        # alerta cliente não existe
-        print(True)
-    elif len(results) > 1:
-        # alerta pedindo pra preencher o cpf do desejado (listar os cpfs)
-        for client in results:
-            print(client.cpf)
+    exist = st.checkProduct(key)
+    if (not exist):
+        ch.save(key, product)
     else:
-        # Adicionar no front o nome, cpf e email do cliente desejado
-        print(True)
-
-    # Arrumar
-    client = Client(results.name, results.surname, results.cpf,
-                    results.email, results.tel, results.date, results.status, results.expense)
+        #! add soma de estoque em produto existente
+        return False
 
 
-def scheduleBilling():
-    # Pegar do front:
-    clientName = ""
-    clientCpf = ""
-    billingDay = ""
-    email = ""
-    emailTitle = ""
-    emailBody = ""
-
-    newBilling = Billings(clientName, clientCpf, email,
-                          emailTitle, emailBody, billingDay)
-
-    key = "Billing_" + clientCpf.replace('.', '-')
-    ch.save(key, newBilling)
-
-
-# ? Scheduler
-    # Rodar diariamente
-    currentDay = ""
+#!
+# ? Forçar Faturamento
+    currentDay = 5
     bill.createBilling(currentDay)
 
 # ? Agenda (Por último, caso dê tempo)
@@ -172,10 +130,9 @@ def scheduleBilling():
 
 #! --------------------------------------------------------------------------------------------------------------------------------
 # ---------------  Running Flask ---------------
-# Futuro: Pegar novo do usuario pela sessao/cadastro/etc... e adicionar ou novo do arquivo de upload
 app = Flask(__name__)
-app._static_folder = '../content'
-#app.config['UPLOAD_FOLDER'] = "static/uploadedexcel/"
+# app._static_folder = '../content'
+# app.config['UPLOAD_FOLDER'] = "static/img/"
 
 
 @app.route("/")
@@ -212,38 +169,60 @@ def client():
         email = request.form.get("email", "")
         tel = request.form.get("tel", "")
         date = request.form.get("date", "")
+        discount = request.form.get("discount", "")
         status = request.form.get("status", "")
 
-        configClient(name, surname, cpf, email, tel, date, status)
+        configClient(name, surname, cpf, email, tel, date, discount, status)
 
     return render_template('client.html')
 
 
 @app.route('/listClients', methods=['POST', 'GET'])
 def listClient():
+    if request.method == 'POST':
+        cl.delClient(request.form.get("delete"))
+
     clients = cl.clientList()
-    clientsTable = ''
 
-    for cl in clients:
-        clientsTable = clientsTable + \
-            f"<tr><td>{clients.index(cl) + 1}</td><td>{cl.name}</td><td>{cl.date}</td><td>{cl.status}</td></tr>"
-
-    return render_template('listClients.html', clientsTable=clientsTable)
+    return render_template('listClients.html', clients=clients)
 
 
 @app.route('/expense', methods=['POST', 'GET'])
 def expense():
-    return render_template('expense.html')
+    if request.method == 'POST':
+        cpf = request.form.get("name", "")
+        product = request.form.get("product", "")
+        qnt = request.form.get("qnt", "")
+
+        addExpense(cpf, product, qnt)
+
+    clients = cl.clientList()
+
+    return render_template('expense.html', clients=clients)
 
 
 @app.route('/stock', methods=['POST', 'GET'])
 def stock():
+    if request.method == 'POST':
+        product = request.form.get("product", "")
+        qnt = request.form.get("qnt", "")
+        cost = request.form.get("cost", "")
+        price = request.form.get("price", "")
+        alert = request.form.get("alert", "")
+
+        configProduct(product, qnt, cost, price, alert)
+
     return render_template('stock.html')
 
 
 @app.route('/listStock', methods=['POST', 'GET'])
 def listStock():
-    return render_template('listStock.html')
+    if request.method == 'POST':
+        st.delProduct(request.form.get("delete"))
+
+    products = st.productList()
+
+    return render_template('listStock.html', products=products)
 
 
 @app.route('/email', methods=['POST', 'GET'])
@@ -251,49 +230,5 @@ def email():
     return render_template('email.html')
 
 
-# @app.route('/upload', methods=['POST', 'GET'])
-# def upload():
-#     if request.method == 'POST':
-#         f = request.files['file']
-#         f.save(app.config['UPLOAD_FOLDER'] + f.filename)
-
-#         try:
-#             fn = "static/uploadedexcel/" + os.path.basename(f.filename)
-#             input_sheet = load_workbook(fn)
-#             sheet = input_sheet.active
-#         except ValueError:
-#             print("Erro no upload de arquivo. Será aceita apenas a extensão .xlsx")
-
-#         code = sheet["AA1"].value
-#         if code == 'expense':
-#             readExpenseFile(sheet)
-#             return "Upload do arquivo de consumo efetuado com sucesso!"
-#         elif code == 'stock':
-#             readStockFile(sheet)
-#             return "Upload do arquivo de estoque efetuado com sucesso!"
-#         elif code == 'dados':
-#             readDataFile(sheet)
-#             return "Upload do arquivo de dados efetuado com sucesso!"
-#         else:
-#             return 'O arquivo não pode ser validado. Por favor utilize os templates disponíveis no github!'
-
-
-# @app.route('/daily', methods=['POST', 'GET'])
-# def daily():
-#     if request.method == 'POST':
-#         if request.form['help'] == 'Call Routines':
-#             try:
-#                 createBilling()
-#             except ValueError:
-#                 return "Erro ao gerar faturamento!"
-#             try:
-#                 checkStock()
-#             except ValueError:
-#                 return "Erro ao realizar a verificação do estoque!"
-
-#             return "Faturamento e checagem de estoque rodados com sucesso!!"
-#         elif request.form['help'] == 'Clean DB':
-#             cleanDatabase()
-#             return "Dados de teste excluidos do DB"
 if __name__ == "__main__":
     app.run()

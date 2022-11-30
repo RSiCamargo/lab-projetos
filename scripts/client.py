@@ -2,16 +2,14 @@ import scripts.cache as ch
 
 
 def checkClient(key):
-    try:
-        response = ch.load(key)
-    except Exception as ex:
-        print("Erro durante salvamento de dados: ", ex)
-
-    return response != False
+    if (ch.load(key) == False):
+        return False
+    else:
+        return True
 
 
 def clientList():
-    clients = ch.loadAll("Client_")
+    clients = ch.loadAll("Client")
     return clients
 
 
@@ -23,3 +21,8 @@ def findByName(name):
             result.append(cl)
 
     return result
+
+
+def delClient(cpf):
+    key = "Client_" + cpf.replace('.', '').replace('-', '')
+    ch.delete(key)

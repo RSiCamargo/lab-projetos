@@ -1,4 +1,3 @@
-from nis import cat
 from sqlitedict import SqliteDict
 
 
@@ -26,9 +25,18 @@ def loadAll(catKey, cache_file="cache.sqlite3"):
     try:
         with SqliteDict(cache_file) as mydict:
             for key in mydict.keys():
-                if key.contains(catKey):
+                if catKey in key:
                     ret.append(mydict[key])
         return ret
     except Exception as ex:
         print("Erro durante carregamento de dados: ", ex)
         return False
+
+
+def delete(key, cache_file="cache.sqlite3"):
+    try:
+        with SqliteDict(cache_file) as mydict:
+            mydict.pop(key)
+            mydict.commit()
+    except Exception as ex:
+        print("Erro durante exclusao de dados: ", ex)

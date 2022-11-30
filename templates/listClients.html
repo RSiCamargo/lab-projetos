@@ -11,24 +11,29 @@
     </head>
 <body style="background-color:  #f5f5f5">
     <nav class="navbar navbar-light bg-secondary">
-        <a class="navbar-brand" style="margin-left: 10px;" href="home.html">
+        <a class="navbar-brand" style="margin-left: 10px;" href="/">
           <img src="../static/img/navbar.png" width="100" height="40" class="d-inline-block align-top" alt="">
         </a>
-      </nav>
-    <div class="container border rounded shadow-lg" style="width: 400vh;margin-top: 20vh;background-color: white;">
-          <table class="table">
-            <thead class="thead-light">
-              <tr>
-                <th scope="row">#</th>
-                <th scope="col">Nome do cliente</th>
-                <th scope="col">Data de faturamento</th>
-                <th scope="col">Ativo</th>
-              </tr>
-            </thead>
-            <tbody>
-              {{ clientsTable }}
-            </tbody>
-          </table>
-    </div>
+    </nav>
+    <form action = "http://127.0.0.1:5000/listClients" method = "POST" enctype = "multipart/form-data">
+        <div class="container border rounded shadow-lg" style="width: 400vh;margin-top: 10vh;background-color: white;">
+              <table class="table">
+                <thead class="thead-light">
+                  <tr>
+                    <th scope="row">#</th>
+                    <th scope="col">Nome do cliente</th>
+                    <th scope="col">Data de faturamento</th>
+                    <th scope="col">Status</th>
+                    <th scope="col"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                    {% for client in clients %}
+                        <tr><td class="align-middle">{{clients.index(client)}}</td><td class="align-middle">{{client.name}}</td><td class="align-middle">{{client.date}}</td><td class="align-middle">{{'Ativo' if(client.status == True) else 'Inativo'}}</td><td><button type="submit" name="delete" value="{{client.cpf}}" class="text-center btn btn-link"><i class="fa-solid fa-trash"></i></button></td></tr>
+                    {% endfor %}
+                </tbody>
+              </table>
+        </div>
+    </form>
 </body>
 </html>

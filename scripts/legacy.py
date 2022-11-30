@@ -162,3 +162,49 @@
 #         print(
 #             f"Foi retirado {quantidade} unidades do insumo {insumo} no estoque")
 # endregion
+
+
+# @app.route('/upload', methods=['POST', 'GET'])
+# def upload():
+#     if request.method == 'POST':
+#         f = request.files['file']
+#         f.save(app.config['UPLOAD_FOLDER'] + f.filename)
+
+#         try:
+#             fn = "static/uploadedexcel/" + os.path.basename(f.filename)
+#             input_sheet = load_workbook(fn)
+#             sheet = input_sheet.active
+#         except ValueError:
+#             print("Erro no upload de arquivo. Será aceita apenas a extensão .xlsx")
+
+#         code = sheet["AA1"].value
+#         if code == 'expense':
+#             readExpenseFile(sheet)
+#             return "Upload do arquivo de consumo efetuado com sucesso!"
+#         elif code == 'stock':
+#             readStockFile(sheet)
+#             return "Upload do arquivo de estoque efetuado com sucesso!"
+#         elif code == 'dados':
+#             readDataFile(sheet)
+#             return "Upload do arquivo de dados efetuado com sucesso!"
+#         else:
+#             return 'O arquivo não pode ser validado. Por favor utilize os templates disponíveis no github!'
+
+
+# @app.route('/daily', methods=['POST', 'GET'])
+# def daily():
+#     if request.method == 'POST':
+#         if request.form['help'] == 'Call Routines':
+#             try:
+#                 createBilling()
+#             except ValueError:
+#                 return "Erro ao gerar faturamento!"
+#             try:
+#                 checkStock()
+#             except ValueError:
+#                 return "Erro ao realizar a verificação do estoque!"
+
+#             return "Faturamento e checagem de estoque rodados com sucesso!!"
+#         elif request.form['help'] == 'Clean DB':
+#             cleanDatabase()
+#             return "Dados de teste excluidos do DB"
