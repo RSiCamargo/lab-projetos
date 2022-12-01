@@ -9,7 +9,7 @@
 from xml.etree.ElementTree import tostring
 from flask import Flask, render_template, request, redirect, url_for
 from flask_bootstrap import Bootstrap
-import datetime
+from datetime import date
 import os
 
 # Scripts
@@ -62,8 +62,6 @@ class Product:
 
 #! --------------------------------------------------------------------------------------------------------------------------------
 # ? Dados do Usuário
-
-
 def configUser(name, email, tel, city):
     user = User(name, email, tel, city)
     ch.save("User_key", user)
@@ -99,13 +97,16 @@ def addExpense(cpf, product, qnt):
     client = ch.load(key)
 
     newExpenses = {
-        stockProduct.product: qnt
+        "product": stockProduct.product,
+        "qnt": qnt,
+        "date": str(date.today())
     }
 
     stockProduct.qnt = int(stockProduct.qnt) - int(qnt)
     ch.save(pKey, stockProduct)
 
     client.expense.append(newExpenses)
+    print(client.expense)
     ch.save(key, client)
 
 
@@ -123,6 +124,17 @@ def configProduct(product, qnt, cost, price, alert):
         return False
 
 
+# ? Estoque
+def emailTemplate(cpf, title, body):
+    key = "Client_" + cpf.replace('.', '').replace('-', '')
+    client = ch.load(key)
+
+    client.title = title
+    client.body = body
+
+    ch.save(key, client)
+
+
 #!
 # ? Forçar Faturamento
     currentDay = 5
@@ -138,8 +150,11 @@ app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = "static/img/"
 
 
-@app.route("/")
+@app.route("/", methods=['POST', 'GET'])
 def home():
+    if request.method == 'POST':
+        print("executar rotina de faturamento")
+
     full_filename = os.path.join(app.config['UPLOAD_FOLDER'], 'title.png')
     return render_template('home.html', image=full_filename)
 
@@ -230,8 +245,41 @@ def listStock():
 
 
 @app.route('/email', methods=['POST', 'GET'])
-def email():
-    return render_template('email.html')
+def emails():
+    if request.method == 'POST':
+        cpf = request.form.get("name", "")
+        title = request.form.get("title", "")
+        body = request.form.get("body", "")
+
+        emailTemplate(cpf, title, body)
+
+    clients = cl.clientList()
+
+    return render_template('email.html', clients=clients)
+
+
+@app.route('/clientExpense', methods=['POST', 'GET'])
+def clientExpense():
+    expenses = {}
+
+    if request.method == 'POST':
+        clientCpf = cpf = request.form.get("name", "")
+        key = "Client_" + str(clientCpf).replace('.', '').replace('-', '')
+        client = ch.load(key)
+
+        if (bool(client.expense)):
+            expenses = client.expense
+            # for d in client.expense:
+            #     if not list(d.keys())[0] in expenses:
+            #         expenses[list(d.keys())[0]] = list(d.values())[0]
+            #     else:
+            #         val = int(expenses.get(str(list(d.keys())[0])))
+            #         expenses[list(d.keys())[0]] = str(
+            #             int(list(d.values())[0]) + val)
+
+    clients = cl.clientList()
+
+    return render_template('clientExpense.html', clients=clients, expenses=expenses)
 
 
 if __name__ == "__main__":

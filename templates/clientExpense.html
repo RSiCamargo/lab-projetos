@@ -16,28 +16,26 @@
         </a>
       </nav>
     <div class="container border rounded shadow-lg" style="width: 60vh;margin-top: 15vh;background-color: white;">
-        <h3 class="text-center mb-5">Cadastre a estrutura do email</h3>
-        <form action = "http://127.0.0.1:5000/email" method = "POST" enctype = "multipart/form-data">
+        <h3 class="text-center mb-5">Cadastro de consumo</h3>
+        <form action = "http://127.0.0.1:5000/clientExpense" method = "POST" enctype = "multipart/form-data">
             <div class="form-group mb-3">
                 <label for="exampleFormControlInput1">Nome do cliente:</label>
-                <select name="name" id="name">
+                <select style="padding-right: 2rem" name="name" id="name">
                     {% for client in clients %}
                         <option value="{{client.cpf}}">{{client.name}} {{client.surname}}</option>
                     {% endfor %}
                 </select>
+
+                <button class="btn"><i class="fa-solid fa-magnifying-glass" type= "submit"></i></button>
             </div>
-            <div class="form-group mb-3">
-              <label for="exampleFormControlInput1">Título:</label>
-              <input type="text" class="form-control" id="exampleFormControlInput1" name="title" placeholder="Informe o título da mensagem">
-            </div>
-            <div class="form-group mb-3">
-                <label for="exampleFormControlInput1">Corpo:</label>
-                <input type="textarea" class="form-control" id="exampleFormControlInput1" name="body" placeholder="Informe o corpo da mensagem">
-              </div>
-            <div class="text-center">
-                <button class="btn btn-lg btn-success rounded-pill mb-3" type="submit">Salvar</button>
-                <a class="btn btn-lg btn-warning rounded-pill mb-3" href="/">Voltar</a>
-            </div>
+
+            <label style="padding-bottom: 1rem"><b>Produtos</b></label><label style="padding-left: 10rem;padding-bottom: 1rem"><b>Quantidade</b></label><label style="padding-left: 10rem;padding-bottom: 1rem"><b>Data</b></label>
+            
+            {% for expense in expenses %}
+                    <div class="form-group mb-3">
+                        <label>{{ expense["product"] }}</label><label style="padding-left: 12.5rem">{{ expense["qnt"] }}</label><label style="padding-left: 11.5rem">{{ expense["date"] }}</label>
+                    </div>
+            {% endfor %}
         </form>
     </div>
 </body>
