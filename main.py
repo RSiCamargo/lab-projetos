@@ -26,6 +26,9 @@ name = ''
 email = ''
 tel = ''
 city = ''
+type = ''
+message = ''
+alert = 'none'
 
 
 class User:
@@ -76,6 +79,7 @@ def configClient(name, surname, cpf, email, tel, date, discount, status):
     exist = cl.checkClient(key)
     if (not exist):
         ch.save(key, client)
+    return 0
 
 
 # ? Registrar Consumo
@@ -86,12 +90,10 @@ def addExpense(cpf, product, qnt):
     if (exist):
         stockProduct = ch.load(pKey)
     else:
-        #! Add alerta
-        return
+        return 1
 
     if (int(stockProduct.qnt) < int(qnt)):
-        #! Add alerta
-        return
+        return 2
 
     key = "Client_" + cpf.replace('.', '').replace('-', '')
     client = ch.load(key)
@@ -108,6 +110,8 @@ def addExpense(cpf, product, qnt):
     client.expense.append(newExpenses)
     print(client.expense)
     ch.save(key, client)
+    alert = 'none'
+    return 0
 
 
 # ? Estoque
@@ -208,20 +212,39 @@ def listClient():
 
 @app.route('/expense', methods=['POST', 'GET'])
 def expense():
+    alert = 'none'
+    message = 'none'
+    type = 'success'
     if request.method == 'POST':
         cpf = request.form.get("name", "")
         product = request.form.get("product", "")
         qnt = request.form.get("qnt", "")
 
-        addExpense(cpf, product, qnt)
+        if(addExpense(cpf, product, qnt) == 1):
+            alert = 'block'
+            message = 'Produto não existe!'
+            type = 'danger'
+        elif(addExpense(cpf, product, qnt) == 2):
+            alert = 'block'
+            message = 'Quantidade superior ao estoque!'
+            type = 'danger'
+        else:
+            alert = 'block'
+            message = 'Consumo cadastrado!'
+            type = 'success'
+
 
     clients = cl.clientList()
 
-    return render_template('expense.html', clients=clients)
+    return render_template('expense.html', clients=clients, alert=alert, message=message, type=type)
 
 
 @app.route('/stock', methods=['POST', 'GET'])
 def stock():
+    alert = 'none'
+    message = 'none'
+    type = 'success'
+
     if request.method == 'POST':
         product = request.form.get("product", "")
         qnt = request.form.get("qnt", "")
@@ -229,9 +252,12 @@ def stock():
         price = request.form.get("price", "")
         alert = request.form.get("alert", "")
 
-        configProduct(product, qnt, cost, price, alert)
+        if(configProduct(product, qnt, cost, price, alert) == 0):
+            alert = 'block'
+            message = 'Produto cadastrado no estoque'
+            type = 'success'
 
-    return render_template('stock.html')
+    return render_template('stock.html', alert=alert, message=message, type=type)
 
 
 @app.route('/listStock', methods=['POST', 'GET'])
