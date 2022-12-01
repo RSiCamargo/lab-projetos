@@ -15,8 +15,8 @@
       <img src="/static/img/navbar.png" width="200" height="70" class="align-top" alt="">
     </a>
   </nav>
-    <div class="container border rounded shadow-lg" style="width: 60vh;margin-top: 15vh;background-color: white;">
-        <h3 class="text-center mb-5">Cadastre seu cliente</h3>
+    <div class="container border rounded shadow-lg" style="width: 60vh;margin-top: 10vh;background-color: white;">
+        <h3 class="text-center mb-3">Cadastre seu cliente</h3>
         <form action = "http://127.0.0.1:5000/client" method = "POST" enctype = "multipart/form-data">
             <div class="alert alert-{{ type }}" style="display: {{ alert }};">
                 {{ message }}
@@ -49,9 +49,9 @@
                 <label for="exampleFormControlInput1">Desconto do cliente</label>
                 <input type="number" class="form-control" id="exampleFormControlInput1" name="discount" placeholder="Informe o desconto do clinete">
             </div>
-                <div class="form-check mb-3">
+                <div class="form-group mb-3">
                 <label for="cars">Status Cliente:</label>
-                <select name="status" id="status">
+                <select class="form-select" name="status" id="status">
                     <option value="ativo">Ativo</option>
                     <option value="inativo">Inativo</option>
                 </select>
