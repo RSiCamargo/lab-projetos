@@ -66,8 +66,23 @@ class Product:
 #! --------------------------------------------------------------------------------------------------------------------------------
 # ? Dados do Usuário
 def configUser(name, email, tel, city):
-    user = User(name, email, tel, city)
-    ch.save("User_key", user)
+    oldUser = ch.load("User_key")
+    if (name == ""):
+        name = oldUser.name
+
+    if (email == ""):
+        email = oldUser.email
+
+    if (tel == ""):
+        tel = oldUser.tel
+
+    if (city == ""):
+        city = oldUser.city
+
+    newUser = User(name, email, tel, city)
+
+    ch.save("User_key", newUser)
+    return 0
 
 
 # ? Cadastrar Cliente
@@ -101,7 +116,8 @@ def addExpense(cpf, product, qnt):
     newExpenses = {
         "product": stockProduct.product,
         "qnt": qnt,
-        "date": str(date.today())
+        "date": str(date.today()),
+        "total": float(100 - float(client.discount)) * 0.01 * (float(stockProduct.price) * float(qnt))
     }
 
     stockProduct.qnt = int(stockProduct.qnt) - int(qnt)
@@ -139,14 +155,6 @@ def emailTemplate(cpf, title, body):
     ch.save(key, client)
 
 
-#!
-# ? Forçar Faturamento
-    currentDay = 5
-    bill.createBilling(currentDay)
-
-# ? Agenda (Por último, caso dê tempo)
-
-
 #! --------------------------------------------------------------------------------------------------------------------------------
 # ---------------  Running Flask ---------------
 app = Flask(__name__)
@@ -157,7 +165,8 @@ app.config['UPLOAD_FOLDER'] = "static/img/"
 @app.route("/", methods=['POST', 'GET'])
 def home():
     if request.method == 'POST':
-        print("executar rotina de faturamento")
+        currentDay = 1
+        bill.createBilling(currentDay)
 
     full_filename = os.path.join(app.config['UPLOAD_FOLDER'], 'title.png')
     return render_template('home.html', image=full_filename)
@@ -165,13 +174,24 @@ def home():
 
 @app.route('/user', methods=['POST', 'GET'])
 def user():
+    alert = 'none'
+    message = 'none'
+    type = 'success'
+
     if request.method == 'POST':
         name = request.form.get("name", "")
         email = request.form.get("email", "")
         tel = request.form.get("tel", "")
         city = request.form.get("city", "")
 
-        configUser(name, email, tel, city)
+        if (configUser(name, email, tel, city) == 0):
+            alert = 'block'
+            message = 'Informações cadastradas!'
+            type = 'success'
+        else:
+            alert = 'block'
+            message = 'Usuário já cadastrado!'
+            type = 'danger'
 
     user = ch.load("User_key")
 
@@ -179,8 +199,9 @@ def user():
     email = user.email
     tel = user.tel
     city = user.city
+    print(name)
 
-    return render_template('user.html', name=name, email=email, tel=tel, city=city)
+    return render_template('user.html', name=name, email=email, tel=tel, city=city, alert=alert, message=message, type=type)
 
 
 @app.route('/client', methods=['POST', 'GET'])
@@ -215,16 +236,18 @@ def expense():
     alert = 'none'
     message = 'none'
     type = 'success'
+
     if request.method == 'POST':
         cpf = request.form.get("name", "")
         product = request.form.get("product", "")
         qnt = request.form.get("qnt", "")
 
-        if(addExpense(cpf, product, qnt) == 1):
+        res = addExpense(cpf, product, qnt)
+        if (res == 1):
             alert = 'block'
             message = 'Produto não existe!'
             type = 'danger'
-        elif(addExpense(cpf, product, qnt) == 2):
+        elif (res == 2):
             alert = 'block'
             message = 'Quantidade superior ao estoque!'
             type = 'danger'
@@ -232,7 +255,6 @@ def expense():
             alert = 'block'
             message = 'Consumo cadastrado!'
             type = 'success'
-
 
     clients = cl.clientList()
 
@@ -252,7 +274,7 @@ def stock():
         price = request.form.get("price", "")
         alert = request.form.get("alert", "")
 
-        if(configProduct(product, qnt, cost, price, alert) == 0):
+        if (configProduct(product, qnt, cost, price, alert) == 0):
             alert = 'block'
             message = 'Produto cadastrado no estoque'
             type = 'success'

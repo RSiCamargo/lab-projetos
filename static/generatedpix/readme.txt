@@ -1,1 +1,0 @@
-Arquivo para armazenar os codigos QR dos pixs gerados
