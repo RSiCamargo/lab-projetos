@@ -81,6 +81,7 @@ def configClient(name, surname, cpf, email, tel, date, discount, status):
     exist = cl.checkClient(key)
     if (not exist):
         ch.save(key, client)
+    return 0
 
 
 # ? Registrar Consumo
@@ -225,6 +226,10 @@ def expense():
 
 @app.route('/stock', methods=['POST', 'GET'])
 def stock():
+    alert = 'none'
+    message = 'none'
+    type = 'success'
+
     if request.method == 'POST':
         product = request.form.get("product", "")
         qnt = request.form.get("qnt", "")
@@ -232,9 +237,12 @@ def stock():
         price = request.form.get("price", "")
         alert = request.form.get("alert", "")
 
-        configProduct(product, qnt, cost, price, alert)
+        if(configProduct(product, qnt, cost, price, alert) == 0):
+            alert = 'block'
+            message = 'Produto cadastrado no estoque'
+            type = 'success'
 
-    return render_template('stock.html')
+    return render_template('stock.html', alert=alert, message=message, type=type)
 
 
 @app.route('/listStock', methods=['POST', 'GET'])

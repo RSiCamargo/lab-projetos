@@ -18,6 +18,9 @@
     <div class="container border rounded shadow-lg" style="width: 60vh;margin-top: 15vh;background-color: white;">
         <h3 class="text-center mb-5">Cadastre seu cliente</h3>
         <form action = "http://127.0.0.1:5000/client" method = "POST" enctype = "multipart/form-data">
+            <div class="alert alert-{{ type }}" style="display: {{ alert }};">
+                {{ message }}
+            </div>
             <div class="form-group mb-3">
               <label for="exampleFormControlInput1">Nome:</label>
               <input type="text" class="form-control" id="exampleFormControlInput1" name="name" placeholder="Informe nome do cliente">
