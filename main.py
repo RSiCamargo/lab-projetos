@@ -81,8 +81,10 @@ def configUser(name, email, tel, city):
 
     newUser = User(name, email, tel, city)
 
-    ch.save("User_key", newUser)
-    return 0
+    if (ch.save("User_key", newUser)):
+        return 0
+    else:
+        return 1
 
 
 # ? Cadastrar Cliente
@@ -94,7 +96,9 @@ def configClient(name, surname, cpf, email, tel, date, discount, status):
     exist = cl.checkClient(key)
     if (not exist):
         ch.save(key, client)
-    return 0
+        return 0
+    else:
+        return 1
 
 
 # ? Registrar Consumo
@@ -147,12 +151,17 @@ def configProduct(product, qnt, cost, price, alert):
 # ? Estoque
 def emailTemplate(cpf, title, body):
     key = "Client_" + cpf.replace('.', '').replace('-', '')
+    exist = cl.checkClient(key)
     client = ch.load(key)
 
-    client.title = title
-    client.body = body
+    client.title = str(title)
+    client.body = str(body)
 
-    ch.save(key, client)
+    if (exist):
+        ch.save(key, client)
+        return 0
+    else:
+        return 1
 
 
 #! --------------------------------------------------------------------------------------------------------------------------------
@@ -177,7 +186,6 @@ def user():
     alert = 'none'
     message = 'none'
     type = 'success'
-
     if request.method == 'POST':
         name = request.form.get("name", "")
         email = request.form.get("email", "")
@@ -194,18 +202,21 @@ def user():
             type = 'danger'
 
     user = ch.load("User_key")
+    print(user)
 
     name = user.name
     email = user.email
     tel = user.tel
     city = user.city
-    print(name)
 
     return render_template('user.html', name=name, email=email, tel=tel, city=city, alert=alert, message=message, type=type)
 
 
 @app.route('/client', methods=['POST', 'GET'])
 def client():
+    alert = 'none'
+    message = 'none'
+    type = 'success'
     if request.method == 'POST':
         name = request.form.get("name", "")
         surname = request.form.get("surname", "")
@@ -216,9 +227,16 @@ def client():
         discount = request.form.get("discount", "")
         status = request.form.get("status", "")
 
-        configClient(name, surname, cpf, email, tel, date, discount, status)
+        if (configClient(name, surname, cpf, email, tel, date, discount, status) == 0):
+            alert = 'block'
+            message = 'Cliente cadastrado!'
+            type = 'success'
+        else:
+            alert = 'block'
+            message = 'Cliente já cadastrado!'
+            type = 'danger'
 
-    return render_template('client.html')
+    return render_template('client.html', alert=alert, message=message, type=type)
 
 
 @app.route('/listClients', methods=['POST', 'GET'])
@@ -236,7 +254,6 @@ def expense():
     alert = 'none'
     message = 'none'
     type = 'success'
-
     if request.method == 'POST':
         cpf = request.form.get("name", "")
         product = request.form.get("product", "")
@@ -294,16 +311,27 @@ def listStock():
 
 @app.route('/email', methods=['POST', 'GET'])
 def emails():
+    alert = 'none'
+    message = 'none'
+    type = 'success'
+
     if request.method == 'POST':
         cpf = request.form.get("name", "")
         title = request.form.get("title", "")
         body = request.form.get("body", "")
 
-        emailTemplate(cpf, title, body)
+        if (emailTemplate(cpf, title, body) == 0):
+            alert = 'block'
+            message = 'Estrutura do email salva!'
+            type = 'success'
+        else:
+            alert = 'block'
+            message = 'Erro ao alterar estrutura do email!'
+            type = 'danger'
 
     clients = cl.clientList()
 
-    return render_template('email.html', clients=clients)
+    return render_template('email.html', clients=clients, alert=alert, message=message, type=type)
 
 
 @app.route('/clientExpense', methods=['POST', 'GET'])
