@@ -16,6 +16,7 @@ import os
 import pandas as pd
 import scripts.client as cl
 import scripts.billing as bill
+import scripts.stockMail as sm
 import scripts.cache as ch
 import scripts.stock as st
 
@@ -81,10 +82,8 @@ def configUser(name, email, tel, city):
 
     newUser = User(name, email, tel, city)
 
-    if (ch.save("User_key", newUser)):
-        return 0
-    else:
-        return 1
+    ch.save("User_key", newUser)
+    return True
 
 
 # ? Cadastrar Cliente
@@ -137,15 +136,25 @@ def addExpense(cpf, product, qnt):
 # ? Estoque
 def configProduct(product, qnt, cost, price, alert):
     key = "Product_" + product.lower()
-
-    product = Product(product.lower(), qnt, cost, price, alert)
-
     exist = st.checkProduct(key)
+
     if (not exist):
-        ch.save(key, product)
+        prod = Product(product.lower(), qnt, cost, price, alert)
+        ch.save(key, prod)
+
+        return True
     else:
-        #! add soma de estoque em produto existente
-        return False
+        exProd = ch.load(key)
+        newQnt = int(exProd.qnt) + int(qnt)
+
+        exProd.cost = cost
+        exProd.price = price
+        exProd.alert = alert
+        exProd.qnt = newQnt
+
+        ch.save(key, exProd)
+
+        return True
 
 
 # ? Estoque
@@ -176,6 +185,7 @@ def home():
     if request.method == 'POST':
         currentDay = 1
         bill.createBilling(currentDay)
+        sm.checkStockStatus()
 
     full_filename = os.path.join(app.config['UPLOAD_FOLDER'], 'title.png')
     return render_template('home.html', image=full_filename)
@@ -192,13 +202,13 @@ def user():
         tel = request.form.get("tel", "")
         city = request.form.get("city", "")
 
-        if (configUser(name, email, tel, city) == 0):
+        if (configUser(name, email, tel, city)):
             alert = 'block'
-            message = 'Informações cadastradas!'
+            message = 'Informações atualizadas!'
             type = 'success'
         else:
             alert = 'block'
-            message = 'Usuário já cadastrado!'
+            message = 'Não foi possível atualizar as informações!'
             type = 'danger'
 
     user = ch.load("User_key")
@@ -291,10 +301,14 @@ def stock():
         price = request.form.get("price", "")
         alert = request.form.get("alert", "")
 
-        if (configProduct(product, qnt, cost, price, alert) == 0):
+        if (configProduct(product, qnt, cost, price, alert)):
             alert = 'block'
             message = 'Produto cadastrado no estoque'
             type = 'success'
+        else:
+            alert = 'block'
+            message = 'Houve uma falha no cadastramento do produto'
+            type = 'danger'
 
     return render_template('stock.html', alert=alert, message=message, type=type)
 
